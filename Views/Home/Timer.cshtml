@@ -3,5 +3,194 @@
     ViewBag.Title = "Timer";
 }
 
-<h2>Countdown Timer</h2>
 
+<div class="container" style="text-align: center;">
+    <h3>Countdown Timer</h3>
+    <div id="timer"></div>
+    <br />
+    <div class="row">
+        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-2 seconds-timer" id="sub_timer">&#8722 15sec</button>
+        <button class="btn col-md-2 col-xs-2 col-md-offset-1 col-xs-offset-1 start-reset-timer" id="start_button_timer" style="background-color:#006b00">Start</button>
+        <button class="btn col-md-2 col-xs-2 col-md-offset-0 col-xs-offset-2 start-reset-timer" id="reset_button_timer" style="background-color: #ff3e3e">Reset</button>
+        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-1 col-xs-offset-1 seconds-timer" id="add_timer">&#43 15sec</button>
+        <div class="col-md-offset-2"></div>
+    </div>
+   
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            const TIME_LIMIT = 3600;
+            const FULL_DASH_ARRAY = 283;
+            const ALERT_THRESHOLD = 5;
+
+            let isTimeRunning = false;
+            let start_time = 30;
+            let timePassed = 0;
+            let timeLeft = start_time;
+            let timerInterval = null;
+
+            $("#timer").html(`
+            <div class="base-timer">
+                <svg class="base-timer__svg" viewBox="0 0 100 100" >
+                <g class="base-timer__circle">
+                    <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45" />
+                     <path
+                        id="base-timer-path-remaining"
+                        stroke-dasharray="283"
+                        class="base-timer__path-remaining"
+                        d="
+                          M 50, 50
+                          m -45, 0
+                          a 45,45 0 1,0 90,0
+                          a 45,45 0 1,0 -90,0"> 
+                    </path>
+                </g>
+                </svg>
+                 <span id="base-timer-label" class="base-timer__label">
+                    ${formatTimeLeft(timeLeft)}
+                 </span>
+            </div>`);
+      
+
+            $("#start_button_timer").click(() => {
+                if (isTimeRunning === false && start_time <= timePassed) {
+                    return;
+                }
+
+                if (isTimeRunning) {
+                    stopTimer();
+                    $("#start_button_timer").html("Start")
+                    $("#start_button_timer").css("background-color", "#006b00");
+                
+                } else {
+                    startTimer();
+                    $("#start_button_timer").html("Stop")
+                    $("#start_button_timer").css("background-color", "#d27000");
+                }
+               
+                $("#start_button_timer").blur();
+            });
+
+            $("#reset_button_timer").click(() => {
+                $(".base-timer__path-remaining").css("color", "#66fcf1");
+                $(".base-timer__label").css("color", "#f1f1f1");
+
+                onTimesUp();
+                timeLeft = start_time;
+                timePassed = 0;
+                $("#base-timer-label").html(formatTimeLeft(timeLeft));
+                setCircleDasharray();
+                setRemainingPathColor(timeLeft);
+
+
+                $("#reset_button_timer").blur();
+            });
+
+            $("#add_timer").click(() => {
+                if (start_time + 15 > TIME_LIMIT || start_time === timePassed)
+                    return;
+                if (timeLeft < ALERT_THRESHOLD)
+                    $(".base-timer__label").css("color", "#f1f1f1");
+
+             
+                start_time += 15;
+                timeLeft = start_time - timePassed;
+             
+
+                $("#base-timer-label").html(formatTimeLeft(timeLeft));
+                setCircleDasharray();
+                $("#add_timer").blur();
+            });
+
+            $("#sub_timer").click(() => {
+                if (start_time - 15 < 1 || timeLeft < 15)
+                    return;
+
+                if (isTimeRunning) {
+                    timeLeft -= 15;
+                    timePassed += 15;
+                } else {
+                    start_time -= 15;
+                    timeLeft = start_time;
+                }
+                
+                $("#base-timer-label").html(formatTimeLeft(timeLeft));
+                setCircleDasharray();
+                setRemainingPathColor(timeLeft);
+                $("#sub_timer").blur();
+            });
+
+            function onTimesUp() {
+                clearInterval(timerInterval);
+                isTimeRunning = false;
+            }
+
+            function startTimer() {
+
+                timerInterval = setInterval(() => {
+                    isTimeRunning = true;
+                    $(".base-timer__path-remaining").css("color", "#66fcf1");
+
+                    // The amount of time passed increments by one
+                    timePassed = timePassed += 1;
+                    timeLeft = start_time - timePassed;
+
+                    // The time left label is updated
+                    $("#base-timer-label").html(formatTimeLeft(timeLeft));
+
+                    setCircleDasharray();
+                    setRemainingPathColor(timeLeft);
+
+                    if (timeLeft === 0) {
+                        onTimesUp();
+                    }
+                }, 1000);
+            }
+
+            function stopTimer() {
+                onTimesUp();
+            }
+
+            function formatTimeLeft(time) {
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+
+                if (seconds < 10) {
+                    seconds = `0${seconds}`;
+                }
+                if (minutes < 10 && minutes > 0) {
+                    minutes = `0${minutes}`;
+                } 
+                if (minutes < 1) {
+                    minutes = `0${minutes}`;
+                } 
+                    
+
+                return `${minutes}:${seconds}`;
+            }
+
+            function setCircleDasharray() {
+                const circleDasharray = `${(
+                    calculateTimeFraction() * FULL_DASH_ARRAY
+                ).toFixed(0)} 283`;
+                $("#base-timer-path-remaining").attr("stroke-dasharray", circleDasharray);
+            }
+
+            function calculateTimeFraction() {
+                const rawTimeFraction = (timeLeft / start_time);
+                return rawTimeFraction - (1 / start_time) * (1 - rawTimeFraction);
+            }
+
+            function setRemainingPathColor(timeLeft) {
+                if (timeLeft <= ALERT_THRESHOLD) {
+                    $(".base-timer__path-remaining").css("color", "red");
+                    $(".base-timer__label").css("color", "red");
+                }
+            }
+        });
+
+    </script>
+}

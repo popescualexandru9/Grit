@@ -358,6 +358,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\scripts\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
