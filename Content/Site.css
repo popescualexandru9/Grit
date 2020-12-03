@@ -1,4 +1,6 @@
-﻿body {
+﻿@import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap');
+
+body {
     padding-top: 60px;
     padding-bottom: 20px;
 }
@@ -82,13 +84,13 @@ textarea {
     transform: scaleX(-1);
 }
 
-.start-reset-timer {
+.start_reset_timer {
     color: white;
     font-size: 20px;
 }
 
 
-.seconds-timer {
+.seconds_timer {
     font-size: 18px;
     font-weight : 600;
    
@@ -98,4 +100,11 @@ textarea {
     #start_button_timer {
         margin-right : 5px;
     }
+}
+
+#footer_quote {
+    font-family: 'Gloria Hallelujah', cursive;
+    font-size: 18px;
+    color: #ffffff;
+    padding-right: 35px;
 }

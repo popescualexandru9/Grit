@@ -9,10 +9,10 @@
     <div id="timer"></div>
     <br />
     <div class="row">
-        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-2 seconds-timer" id="sub_timer">&#8722 15sec</button>
-        <button class="btn col-md-2 col-xs-2 col-md-offset-1 col-xs-offset-1 start-reset-timer" id="start_button_timer" style="background-color:#006b00">Start</button>
-        <button class="btn col-md-2 col-xs-2 col-md-offset-0 col-xs-offset-2 start-reset-timer" id="reset_button_timer" style="background-color: #ff3e3e">Reset</button>
-        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-1 col-xs-offset-1 seconds-timer" id="add_timer">&#43 15sec</button>
+        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-2 seconds_timer" id="sub_timer">&#8722 15sec</button>
+        <button class="btn col-md-2 col-xs-2 col-md-offset-1 col-xs-offset-1 start_reset_timer" id="start_button_timer" style="background-color:#006b00">Start</button>
+        <button class="btn col-md-2 col-xs-2 col-md-offset-0 col-xs-offset-2 start_reset_timer" id="reset_button_timer" style="background-color: #ff3e3e">Reset</button>
+        <button class="btn btn-primary col-md-1 col-xs-2 col-md-offset-1 col-xs-offset-1 seconds_timer" id="add_timer">&#43 15sec</button>
         <div class="col-md-offset-2"></div>
     </div>
    
@@ -85,6 +85,8 @@
                 setCircleDasharray();
                 setRemainingPathColor(timeLeft);
 
+                $("#start_button_timer").html("Start")
+                $("#start_button_timer").css("background-color", "#006b00");
 
                 $("#reset_button_timer").blur();
             });
@@ -106,16 +108,11 @@
             });
 
             $("#sub_timer").click(() => {
-                if (start_time - 15 < 1 || timeLeft < 15)
+                if (start_time - 15 < 1 || timeLeft <= 15)
                     return;
 
-                if (isTimeRunning) {
-                    timeLeft -= 15;
-                    timePassed += 15;
-                } else {
-                    start_time -= 15;
-                    timeLeft = start_time;
-                }
+                start_time -= 15;
+                timeLeft = start_time - timePassed;
                 
                 $("#base-timer-label").html(formatTimeLeft(timeLeft));
                 setCircleDasharray();
@@ -193,4 +190,8 @@
         });
 
     </script>
+}
+
+@section Quote{
+    You are responsible for you.
 }

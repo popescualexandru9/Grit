@@ -34,8 +34,9 @@
     <div class="container body-content">
         @RenderBody()
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        <footer class="row" style="padding-top : 5px;">
+            <p class="col-xs-6">&copy; @DateTime.Now.Year - Grit by Popescu Alexandru</p>
+            <p class="col-xs-6 text-right" id="footer_quote">@RenderSection("Quote", false) </p>
         </footer>
     </div>
 
