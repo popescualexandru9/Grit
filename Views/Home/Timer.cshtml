@@ -27,7 +27,7 @@
             const ALERT_THRESHOLD = 5;
 
             let isTimeRunning = false;
-            let start_time = 30;
+            let start_time = 90;
             let timePassed = 0;
             let timeLeft = start_time;
             let timerInterval = null;
@@ -70,7 +70,11 @@
                     $("#start_button_timer").html("Stop")
                     $("#start_button_timer").css("background-color", "#d27000");
                 }
-               
+
+                $('#start_button_timer').prop('disabled', true);
+                setTimeout(function () {
+                    $('#start_button_timer').prop('disabled', false);
+                }, 1000); 
                 $("#start_button_timer").blur();
             });
 
