@@ -92,13 +92,12 @@ textarea {
 
 .seconds_timer {
     font-size: 18px;
-    font-weight : 600;
-   
+    font-weight: 600;
 }
 
 @media (min-width: 970px) {
     #start_button_timer {
-        margin-right : 5px;
+        margin-right: 5px;
     }
 }
 
@@ -107,4 +106,12 @@ textarea {
     font-size: 18px;
     color: #ffffff;
     padding-right: 35px;
+}
+
+@media (max-width: 768px) {
+    .xs {
+        margin: 0 auto;
+        min-width: 250px;
+        max-width: 300px;
+    }
 }

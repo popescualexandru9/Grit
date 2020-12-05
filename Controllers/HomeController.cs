@@ -29,8 +29,6 @@ namespace Grit.Controllers
 
         public ActionResult Timer()
         {
-            ViewBag.Message = "Your contact page.";
-
             return View();
         }
     }

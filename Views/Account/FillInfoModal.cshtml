@@ -1,0 +1,101 @@
+﻿@model Grit.Models.RegisterViewModel
+
+@{
+    ViewBag.Title = "Fill Info";
+}
+
+<div class="form-content" style="display:none;">
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+    <div class="row">
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+
+        <div class="col-sm-6 col-sm-offset-3 input-group xs">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Height" })
+            <span class="input-group-addon">cm</span>
+        </div>
+        <br />
+        <div class="col-sm-6 col-sm-offset-3 input-group xs">
+            @Html.TextBoxFor(m => m.Password, new { @class = "form-control", placeholder = "Weight" })
+            <span class="input-group-addon"> Kg</span>
+        </div>
+        <br />
+        <div class="col-sm-6 col-sm-offset-3 input-group xs ">
+            <input class="form-control datepicker" type="text" placeholder="Birthdate" name="Date"/>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar" style="font-size: 17px"></span>
+            </span>
+        </div>
+        <br />
+        <div class="col-sm-6 col-sm-offset-3 xs">
+            <select class="form-control">
+                <option value="" disabled selected>Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+    </div>
+    }
+</div>
+
+
+@section scripts{
+<script>
+    $(document).ready(function () {
+        let modal = bootbox.dialog({
+            closeButton: false,
+            message: $(".form-content").html(),
+            title: "Fill in your information!",
+            buttons: [
+                {
+                    label: "Submit",
+                    className: "btn btn-primary ",
+                    callback: function () {
+
+                        alert($('form #email').val());
+
+                        return false;
+                    }
+                },
+                {
+                    label: "Close",
+                    className: "btn btn-default pull-left",
+                    callback: function () {
+                        console.log("just do something on close");
+                    }
+                }
+            ],
+            show: false,
+            onEscape: function () {
+                modal.modal("hide");
+            }
+        }); 
+
+   
+        modal.modal("show");
+        
+        $(function () {
+            $('.datepicker').datepicker({
+                dateFormat: 'dd M yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: 0,
+                firstDay: 1,
+                yearRange: "-70:+0",
+                beforeShow: function () {
+                    setTimeout(
+                        function () {
+                            $('#ui-datepicker-div').css('z-index', 99999);
+                        }, 100
+                    )
+                }
+            });
+        });
+
+    });
+
+</script>
+}
