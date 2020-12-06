@@ -186,16 +186,17 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202012041401019_Initial.cs" />
-    <Compile Include="Migrations\202012041401019_Initial.designer.cs">
-      <DependentUpon>202012041401019_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202012061714027_Initial.cs" />
+    <Compile Include="Migrations\202012061714027_Initial.designer.cs">
+      <DependentUpon>202012061714027_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202012041407533_UsetAllowNulls.cs" />
-    <Compile Include="Migrations\202012041407533_UsetAllowNulls.designer.cs">
-      <DependentUpon>202012041407533_UsetAllowNulls.cs</DependentUpon>
+    <Compile Include="Migrations\202012061723090_AllowNullsFKey.cs" />
+    <Compile Include="Migrations\202012061723090_AllowNullsFKey.designer.cs">
+      <DependentUpon>202012061723090_AllowNullsFKey.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -389,11 +390,12 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Home\Timer.cshtml" />
-    <Content Include="Views\Account\FillInfoModal.cshtml" />
+    <Content Include="Views\Account\FillInfo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Scripts\scripts\" />
+    <Folder Include="Views\Weight\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -407,11 +409,11 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202012041401019_Initial.resx">
-      <DependentUpon>202012041401019_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202012061714027_Initial.resx">
+      <DependentUpon>202012061714027_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202012041407533_UsetAllowNulls.resx">
-      <DependentUpon>202012041407533_UsetAllowNulls.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202012061723090_AllowNullsFKey.resx">
+      <DependentUpon>202012061723090_AllowNullsFKey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

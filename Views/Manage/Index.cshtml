@@ -36,8 +36,8 @@
              
              Uncomment the following block after you have set up two-factor authentication
         *@
-        @*  
-            <dt>Phone Number:</dt>
+         
+           @* <dt>Phone Number:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None")
                 @if (Model.PhoneNumber != null)
@@ -52,7 +52,7 @@
                 }
                 else
                 {
-                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")
+                    <text>[&nbsp;&nbsp;@Html.ActionLink("Add", "AddPhoneNumber")&nbsp;&nbsp;]</text>
                 }
             </dd>
         *@

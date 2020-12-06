@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Grit.Models;
+using System.Net.Mail;
 
 namespace Grit.Controllers
 {
@@ -17,13 +18,16 @@ namespace Grit.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _context;
 
         public AccountController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
+            _context = new ApplicationDbContext();
             UserManager = userManager;
             SignInManager = signInManager;
         }
@@ -50,12 +54,6 @@ namespace Grit.Controllers
             {
                 _userManager = value;
             }
-        }
-
-        [AllowAnonymous]
-        public ActionResult FillInfoModal()
-        {
-            return View();
         }
 
         // GET: /Account/Login
@@ -161,14 +159,20 @@ namespace Grit.Controllers
                 if (result.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    MailAddress addr = new MailAddress(model.Email);
+                    string emailUser = addr.User;
+                    int index = addr.Host.LastIndexOf(".");
+                    string emailHost = addr.Host.Substring(0, index);
+                    
+                   
+                    return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser , emailHost = emailHost});
                 }
                 AddErrors(result);
             }
@@ -410,6 +414,7 @@ namespace Grit.Controllers
 
         protected override void Dispose(bool disposing)
         {
+            _context.Dispose();
             if (disposing)
             {
                 if (_userManager != null)
@@ -428,6 +433,7 @@ namespace Grit.Controllers
             base.Dispose(disposing);
         }
 
+      
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
@@ -484,6 +490,64 @@ namespace Grit.Controllers
                 }
                 context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
             }
+        }
+        #endregion
+
+        #region MyRegion
+
+        [HttpGet]
+        [Route("Account/FillInfo/{emailUser?}/{emailHost?}")]
+        public ActionResult FillInfo()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Route("Account/FillInfo/{emailUser}/{emailHost}")]
+        public async Task<ActionResult> FillInfo(FillInfoViewModel model, string emailUser, string emailHost)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string email = emailUser + "@" + emailHost + ".com";
+            var user = await UserManager.FindByNameAsync(email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by email.");
+            }
+
+
+            // Format weight and height to always have 2 decimals
+  
+            model.DailyWeight = decimal.Parse(model.DailyWeight.ToString("F"));
+            model.Height = decimal.Parse(model.Height.ToString("F"));
+
+            decimal weight = Math.Round(model.DailyWeight, 2);
+
+            int weightEntityId = 0;
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
+            
+            if (weightEntity == null)
+            {
+                WeightController weightController = new WeightController();
+                weightEntityId = weightController.Create(weight);
+            }
+            else
+            {
+                weightEntityId = weightEntity.Id;
+            }
+            user.DailyWeight_Id = weightEntityId;
+
+            user.Height = Math.Round(model.Height, 2);
+            user.Birthdate = model.Birthdate;
+            user.Gender = model.Gender;
+            user.SignUpDate = DateTime.Now;
+
+            UserManager.Update(user);
+            return RedirectToAction("Index", "Home");
         }
         #endregion
     }

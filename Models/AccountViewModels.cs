@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Grit.Models
@@ -108,5 +109,30 @@ namespace Grit.Models
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+    }
+
+    public class FillInfoViewModel
+    {
+        [Required]
+        [RegularExpression(@"^\d+\.?\d{0,2}$", ErrorMessage = "This should contain between 0 and 2 decimals. Ex : 185.20 cm")]
+        [Range(50, 250, ErrorMessage = "Height must be between 50cm and 250cm ")]
+        [Display(Name = "Height")]
+        public decimal Height { get; set; }
+
+        [Required]
+        [Display(Name = "Gender")]
+        public string Gender { get; set; }
+
+        [Required]
+        [RegularExpression(@"^\d+\.?\d{0,2}$", ErrorMessage = "This should contain between 0 and 2 decimals. Ex : 80.2 kg")]
+        [Range(30, 150, ErrorMessage = "Weight must be between30kg and 150kg ")]
+        [Display(Name = "Weight")]
+        public decimal DailyWeight { get; set; }
+
+        [Required]
+        [DataType(DataType.Date)]
+        [Display(Name = "Birthday")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        public DateTime Birthdate { get; set; }
     }
 }

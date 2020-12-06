@@ -11291,6 +11291,7 @@ a.ui-button:active,
 }
 
 #ui-datepicker-div {
+    width : 281px;
     min-height: 230px;
 }
 

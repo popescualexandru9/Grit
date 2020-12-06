@@ -27,6 +27,7 @@ namespace Grit.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult Timer()
         {
             return View();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,6 +17,9 @@ namespace Grit.Models
         public String Gender { get; set; }
 
         public Weight DailyWeight { get; set; }
+
+        [ForeignKey("DailyWeight")]
+        public int? DailyWeight_Id { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? Birthdate { get; set; }

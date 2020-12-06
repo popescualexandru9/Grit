@@ -114,4 +114,4 @@ C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.dll
 C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.pdb
 C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.Migrations.Initial.resources
 C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.csproj.GenerateResource.cache
-C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.Migrations.UsetAllowNulls.resources
+C:\Users\Popi\Desktop\Folder\3 year\DAW\FitnessApp\Grit\obj\Debug\Grit.Migrations.AllowNullsFKey.resources

@@ -1,0 +1,107 @@
+﻿@model Grit.Models.FillInfoViewModel
+
+@{
+    ViewBag.Title = "Fill Info";
+}
+
+<h2> Finishing off.</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="fillInForm">
+            @using (Html.BeginForm("FillInfo", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+
+                <h4>Please fill in your information!</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Height, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10 ">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Height, new { @class = "form-control" })
+                            <span class="input-group-addon">cm</span>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Height, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DailyWeight, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.DailyWeight, new { @class = "form-control" })
+                            <span class="input-group-addon">kg</span>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.DailyWeight, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Birthdate, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Birthdate, "{0:d MMM yyyy}", new { @class = "form-control datepicker", autocomplete = "off" })
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar" style="font-size: 17px"></span>
+                            </span>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Birthdate, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Gender, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.Gender, new List<SelectListItem>
+                            {
+                                 new SelectListItem { Text = "Male", Value = "Male"},
+                                 new SelectListItem { Text = "Female", Value = "Female"},
+                            }, new { @class = "form-control" })
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+
+            }
+        </section>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(function () {
+                $('.datepicker').datepicker({
+                    dateFormat: 'dd M yy',
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: 0,
+                    firstDay: 1,
+                    yearRange: "-70:+0",
+                    beforeShow: function () {
+                        setTimeout(
+                            function () {
+                                $('#ui-datepicker-div').css('z-index', 99999);
+                            }, 100
+                        )
+                    }
+                });
+            });
+        });
+
+    </script>
+
+}
+
+
+@section Quote{
+    Stay Beastly!
+}
