@@ -1,0 +1,105 @@
+﻿@model Grit.ViewModels.MemberDetailsViewModel
+@{
+    ViewBag.Title = "Update Profile";
+}
+
+<h2>Update profile</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="updateForm">
+            @using (Html.BeginForm("Update", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.UserName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10 ">
+                        @Html.TextBoxFor(m => m.User.UserName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.User.UserName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.Height, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10 ">
+                        @Html.TextBoxFor(m => m.User.Height, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.User.Height, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Weight.Weigth, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Weight.Weigth, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Weight.Weigth, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.Gender, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.User.Gender, "", new { @class = "form-control readonly", @readonly = "true" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.Birthdate, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.User.Birthdate, "{0:dd MMM yyyy}", new { @class = "form-control datepicker", autocomplete = "off" })
+                        @Html.ValidationMessageFor(m => m.User.Birthdate, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Member since </label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.User.SignUpDate, "{0:dd MMM yyyy}", new { @class = "form-control readonly", @readonly = "true" })
+                    </div>
+                </div>
+
+
+                @Html.HiddenFor(x => x.User.Email);
+                @Html.AntiForgeryToken();
+
+                <div class="form-group row">
+                    <div id="buttonCancel">
+                        @Html.ActionLink("Cancel", "Index", "Manage", new { @class = "btn btn-primary" })
+                    </div>
+
+                    <div id="buttonUpdate">
+                        <input type="submit" value="Update" class="btn btn-primary" />
+                    </div>
+
+                </div>
+
+            }
+        </section>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(function () {
+                $('.datepicker').datepicker({
+                    dateFormat: 'dd M yy',
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: 0,
+                    firstDay: 1,
+                    yearRange: "-70:+0",
+                    beforeShow: function () {
+                        setTimeout(
+                            function () {
+                                $('#ui-datepicker-div').css('z-index', 99999);
+                            }, 100
+                        )
+                    }
+                });
+            });
+        });
+    </script>
+}

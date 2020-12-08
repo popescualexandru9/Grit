@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
@@ -25,7 +25,14 @@
                     <li>@Html.ActionLink("Timer", "Timer", "Home")</li>
                     <li>@Html.ActionLink("Progress", "Index", "Home")</li>
                     <li>@Html.ActionLink("Calendar", "About", "Home")</li>
-                    <li>@Html.ActionLink("Members", "Contact", "Home")</li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Admin") || User.IsInRole("Employee"))
+                        {
+                            <li>@Html.ActionLink("Members", "Members", "Account")</li>
+                        }
+                    }
                     <hr />
                 </ul>
                 @Html.Partial("_LoginPartial")
@@ -38,8 +45,8 @@
             <hr />
             <footer class="row ">
                 <div class="column col-xs-6" style="padding-left : 0;">
-                    <div class="col-xs-12"> @Html.ActionLink("About", "About", "Home")</div>
-                    <div class="col-xs-12"> @Html.ActionLink("Contact", "Contact", "Home")</div>
+                    @*<div class="col-xs-12"> @Html.ActionLink("About", "About", "Home")</div>
+                    <div class="col-xs-12"> @Html.ActionLink("Contact", "Contact", "Home")</div>*@
                     <p class="col-xs-12" style="margin-top : 10px">&copy; @DateTime.Now.Year - Grit by Popescu Alexandru</p>
                 </div>
                 <div class="column col-xs-6">

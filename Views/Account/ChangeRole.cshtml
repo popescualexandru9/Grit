@@ -1,0 +1,58 @@
+﻿@model  Grit.ViewModels.MemberDetailsViewModel
+
+@{
+    ViewBag.Title = "Role Page";
+}
+
+<h2>Role page.</h2>
+
+
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            @using (Html.BeginForm("ChangeRole", "Account", new { previousRole = Model.RoleName},  FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+
+                <h4>This is @Model.User.UserName.</h4>
+                <hr />
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> Role </label>
+                    <div class="col-md-10">
+
+                        @if (Model.RoleName.Equals("Admin"))
+                        {
+                            @Html.TextBoxFor(x=> x.RoleName,  new { @class = "form-control readonly", @readonly = "true" })
+                        }
+                        else
+                        {
+                            @Html.DropDownListFor(x => x.RoleName, new List<SelectListItem>
+                           {
+                                new SelectListItem { Text = "Admin", Value = "Admin", Disabled =true},
+                                new SelectListItem { Text = "Employee", Value = "Employee"},
+                                new SelectListItem { Text = "Member", Value = "Member"},
+                           }, new { @class = "form-control" })
+                        }
+
+
+                    </div>
+                </div>
+
+                @Html.HiddenFor(x => x.User.Id);
+
+
+                <div class="form-group row">
+                    <div id="buttonCancel">
+                        @Html.ActionLink("Cancel", "Members", "Account", new { @class = "btn btn-primary" })
+                    </div>
+
+                    <div id="buttonUpdate">
+                        <input type="submit" value="Update" class="btn btn-primary" />
+                    </div>
+
+                </div>
+
+            }
+        </section>
+    </div>
+</div>

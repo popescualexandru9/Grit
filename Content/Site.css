@@ -116,3 +116,63 @@ textarea {
     width: 42px;
 }
 
+table > thead {
+    color: #ededed;
+    font-size: 17px;
+}
+
+.deleteMemberLink {
+    color: #ccc;
+}
+
+.memberTableLink {
+    color: #ccc;
+}
+
+table tr a:hover {
+    color: #000000;
+}
+
+.ui-datepicker-calendar > thead > tr {
+    color: #000000;
+}
+.readonly
+{
+    cursor: not-allowed;
+}
+
+#buttonCancel {
+    margin-left: 15px;
+    margin-right: 139px;
+    display: inline-block;
+}
+
+#buttonUpdate {
+    display: inline-block;
+}
+
+@media (min-width : 992px){
+    #buttonCancel {
+        margin-left: 122px;
+
+    }
+}
+
+@media (min-width : 1200px) {
+    #buttonCancel {
+        margin-left: 143px;
+    }
+}
+
+#alertMessage{
+    line-height: 30px;
+    height :60px;
+    position : absolute;
+    top : 60px;
+    display : inline-block;
+    
+}
+
+dt{
+    color :#fff;
+}

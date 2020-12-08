@@ -1,0 +1,141 @@
+﻿@model Grit.ViewModels.MemberDetailsViewModel
+@{
+    ViewBag.Title = "Member Details ";
+}
+
+<div class="alert alert-success" id="alertMessage" style="display:none">
+    <strong>Updated succssesfully!</strong>
+</div>
+
+
+<h2>Details page.</h2>
+
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="updateForm">
+            @using (Html.BeginForm("MemberDetails", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+
+                <h4>This is @Model.User.Email's profile.</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="form-group">
+                    @Html.LabelFor(x => x.User.UserName, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10 ">
+                        @Html.TextBoxFor(x => x.User.UserName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.User.UserName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(x => x.User.Height, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10 ">
+                        @Html.TextBoxFor(x => x.User.Height, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.User.Height, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(x => x.Weight.Weigth, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(x => x.Weight.Weigth, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => x.Weight.Weigth, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(x => x.User.Gender, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(x => x.User.Gender, new List<SelectListItem>
+                            {
+                                 new SelectListItem { Text = "Male", Value = "Male"},
+                                 new SelectListItem { Text = "Female", Value = "Female"},
+                            }, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(x => x.User.Birthdate, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(x => x.User.Birthdate, "{0:dd MMM yyyy}", new { @class = "form-control datepicker", autocomplete = "off" })
+                        @Html.ValidationMessageFor(x => x.User.Birthdate, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Member since </label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(x => x.User.SignUpDate, "{0:dd MMM yyyy}", new { @class = "form-control readonly", @readonly = "true" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Role </label>
+                    <div class="col-md-10">
+                        <input class="form-control readonly" value="@Model.RoleName" readonly />
+                    </div>
+                </div>
+
+                @Html.HiddenFor(x => x.User.Email);
+                @Html.AntiForgeryToken();
+
+                <div class="form-group row">
+                    <div id="buttonCancel">
+                        @Html.ActionLink("Cancel", "Members", "Account", new { @class = "btn btn-primary" })
+                    </div>
+
+                    <div id="buttonUpdate">
+                        <input type="submit" value="Update" class="btn btn-primary" />
+                    </div>
+
+                </div>
+
+            }
+        </section>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+            $(function () {
+                $('.datepicker').datepicker({
+                    dateFormat: 'dd M yy',
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: 0,
+                    firstDay: 1,
+                    yearRange: "-70:+0",
+                    beforeShow: function () {
+                        setTimeout(
+                            function () {
+                                $('#ui-datepicker-div').css('z-index', 99999);
+                            }, 100
+                        )
+                    }
+                });
+            });
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+
+
+        if (status === "ok") {
+            showAlert();
+        }
+
+        function showAlert() {
+            $("#alertMessage").fadeTo(1000, 1).delay(1500).slideUp(500, function () {
+                $("#alertMessage").slideUp(500);
+            });
+        };
+    </script>
+
+}
+
+

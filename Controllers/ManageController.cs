@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Grit.Models;
+using Grit.ViewModels;
 
 namespace Grit.Controllers
 {
@@ -15,9 +16,13 @@ namespace Grit.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApplicationDbContext _context;
 
+
+        #region providedRegion
         public ManageController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -57,6 +62,7 @@ namespace Grit.Controllers
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
+                : message == ManageMessageId.UpdateSuccess ? "Your profile has been updated successfully."
                 : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
@@ -64,13 +70,21 @@ namespace Grit.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+            var user = await UserManager.FindByIdAsync(userId);
+            int age = CalculateAge(user.Birthdate ?? DateTime.Now);
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+                ViewModel = new MemberProfileViewModel
+                {
+                    User = user,
+                    Weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id),
+                    Age = age
+                }
             };
             return View(model);
         }
@@ -324,6 +338,7 @@ namespace Grit.Controllers
 
         protected override void Dispose(bool disposing)
         {
+            _context.Dispose();
             if (disposing && _userManager != null)
             {
                 _userManager.Dispose();
@@ -332,8 +347,9 @@ namespace Grit.Controllers
 
             base.Dispose(disposing);
         }
+#endregion
 
-#region Helpers
+        #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
@@ -378,12 +394,92 @@ namespace Grit.Controllers
             AddPhoneSuccess,
             ChangePasswordSuccess,
             SetTwoFactorSuccess,
+            UpdateSuccess,
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
             Error
         }
 
-#endregion
+        #endregion
+
+        #region MyRegion
+        public ActionResult Update(string id)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id.Equals(id));
+            var weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by id.");
+            }
+
+            var detailsModel = new MemberDetailsViewModel
+            {
+                User = user,
+                Weight = weight
+            };
+            return View(detailsModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Update (MemberDetailsViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await UserManager.FindByEmailAsync(model.User.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by email.");
+            }
+
+            // Format weight and height to always have 2 decimals
+            decimal weight = decimal.Parse(model.Weight.Weigth.ToString("F"));
+            decimal height = decimal.Parse((model.User.Height ?? 0).ToString("F"));
+
+            weight = Math.Round(weight, 2);
+
+            // Search for weight in database and store its id
+            int weightEntityId;
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
+
+            if (weightEntity == null)
+            {
+                // If not found, create new weight
+                WeightController weightController = new WeightController();
+                weightEntityId = weightController.Create(weight);
+            }
+            else
+                weightEntityId = weightEntity.Id;
+
+
+            // Asign values to user
+            user.UserName = model.User.UserName;
+            user.DailyWeight_Id = weightEntityId;
+            user.Height = Math.Round(height, 2);
+            user.Birthdate = model.User.Birthdate;
+
+            UserManager.Update(user);
+            return RedirectToAction("Index", new
+            {
+                Message = ManageMessageId.UpdateSuccess
+            });
+        }
+
+        private int CalculateAge(DateTime signUpDate)
+        {
+            var age = DateTime.Today.Year - signUpDate.Year;
+
+            if (signUpDate.Date > DateTime.Today.AddYears(-age)) age--;
+
+            return age;
+        }
+        #endregion
+
     }
 }

@@ -14,12 +14,11 @@ namespace Grit.Models
 
         [Required]
         [DataType(DataType.Date)]
-        [Display(Name = "Today's date")]
+        [Display(Name = "Date")]
         public DateTime Date { get; set; }
 
         [Required]
-        [RegularExpression(@"^\d+\.\d{0,2}$")]
-        [Display(Name = "Today's weight")]
+        [Display(Name = "Weight")]
         public decimal Weigth { get; set; }
 
     }

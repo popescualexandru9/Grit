@@ -10,6 +10,9 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Grit.Models;
 using System.Net.Mail;
+using Grit.ViewModels;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Collections.Generic;
 
 namespace Grit.Controllers
 {
@@ -20,6 +23,7 @@ namespace Grit.Controllers
         private ApplicationUserManager _userManager;
         private ApplicationDbContext _context;
 
+        #region providedRegion
         public AccountController()
         {
             _context = new ApplicationDbContext();
@@ -78,7 +82,8 @@ namespace Grit.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -158,6 +163,8 @@ namespace Grit.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+
+                    await UserManager.AddToRoleAsync(user.Id, "Member");
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
 
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
@@ -432,8 +439,8 @@ namespace Grit.Controllers
 
             base.Dispose(disposing);
         }
+        #endregion
 
-      
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
@@ -495,7 +502,6 @@ namespace Grit.Controllers
 
         #region MyRegion
 
-        [HttpGet]
         [Route("Account/FillInfo/{emailUser?}/{emailHost?}")]
         public ActionResult FillInfo()
         {
@@ -503,6 +509,7 @@ namespace Grit.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route("Account/FillInfo/{emailUser}/{emailHost}")]
         public async Task<ActionResult> FillInfo(FillInfoViewModel model, string emailUser, string emailHost)
         {
@@ -527,20 +534,22 @@ namespace Grit.Controllers
 
             decimal weight = Math.Round(model.DailyWeight, 2);
 
-            int weightEntityId = 0;
+            // Search for weight in database and store its id
+            int weightEntityId;
             var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
             
             if (weightEntity == null)
             {
+                // If not found, create new weight
                 WeightController weightController = new WeightController();
                 weightEntityId = weightController.Create(weight);
             }
             else
-            {
                 weightEntityId = weightEntity.Id;
-            }
-            user.DailyWeight_Id = weightEntityId;
+            
 
+            // Asign values to user
+            user.DailyWeight_Id = weightEntityId;
             user.Height = Math.Round(model.Height, 2);
             user.Birthdate = model.Birthdate;
             user.Gender = model.Gender;
@@ -549,6 +558,149 @@ namespace Grit.Controllers
             UserManager.Update(user);
             return RedirectToAction("Index", "Home");
         }
+
+        [Authorize (Roles = "Employee, Admin")]
+        [Route("Account/Members")]
+        public ActionResult Members()
+        {
+            var users = _context.Users.ToList();
+            IList<string> roles = new List<string>();
+            foreach ( var user in users)
+            {
+                roles.Add(UserManager.GetRoles(user.Id).FirstOrDefault());
+            }
+
+            var membersModel = new MembersViewModel
+            {
+                Users =  users,
+                RoleName = roles
+            };
+
+            return View(membersModel);
+        }
+
+        public ActionResult DeleteMember(string id)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id.Equals(id));
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by id.");
+            }
+
+            _context.Users.Attach(user);
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+
+            return RedirectToAction("Members", "Account");
+
+        }
+
+        [Authorize(Roles = "Employee, Admin")]
+        public ActionResult MemberDetails(string id, string status)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id.Equals(id));
+
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by id.");
+            }
+   
+            var detailsModel = new MemberDetailsViewModel
+            {
+                User = user,
+                Weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id),
+                RoleName = UserManager.GetRoles(user.Id).FirstOrDefault()
+            };
+            return View(detailsModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Employee, Admin")]
+        public async Task<ActionResult> MemberDetails(MemberDetailsViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await UserManager.FindByEmailAsync(model.User.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by email.");
+            }
+
+            // Format weight and height to always have 2 decimals
+            decimal weight = decimal.Parse(model.Weight.Weigth.ToString("F"));
+            decimal height = decimal.Parse((model.User.Height??0).ToString("F"));
+
+            weight = Math.Round(weight, 2);
+
+            // Search for weight in database and store its id
+            int weightEntityId;
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
+
+            if (weightEntity == null)
+            {
+                // If not found, create new weight
+                WeightController weightController = new WeightController();
+                weightEntityId = weightController.Create(weight);
+            }
+            else
+                weightEntityId = weightEntity.Id;
+
+
+            // Asign values to user
+            user.UserName = model.User.UserName;
+            user.DailyWeight_Id = weightEntityId;
+            user.Height = Math.Round(height, 2);
+            user.Birthdate = model.User.Birthdate;
+            user.Gender = model.User.Gender;
+
+            UserManager.Update(user);
+            return RedirectToAction("MemberDetails", "Account", new {id = user.Id, status="ok"});
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult ChangeRole(string id)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id.Equals(id));
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by id.");
+            }
+
+            var detailsModel = new MemberDetailsViewModel
+            {
+                User = user,
+                Weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id),
+                RoleName = UserManager.GetRoles(user.Id).FirstOrDefault()
+            };
+
+            return View(detailsModel);
+
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> ChangeRole(MemberDetailsViewModel model, string previousRole)
+        {
+            var user = _context.Users.SingleOrDefault(x => x.Id.Equals(model.User.Id));
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                throw new HttpException(404, "Can't find user by id.");
+            }
+            var result = await UserManager.RemoveFromRoleAsync(user.Id, previousRole);
+            await UserManager.AddToRoleAsync(user.Id, model.RoleName);
+            return RedirectToAction("Members", "Account");
+        }
+
         #endregion
     }
 }
