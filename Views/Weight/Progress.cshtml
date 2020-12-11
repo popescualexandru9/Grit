@@ -1,0 +1,314 @@
+﻿@model  Grit.ViewModels.ProgressViewModel
+@{
+    string[] options = { "One Week", "One Month", "Two Months", "Three Months", "Six Months", "One Year", "Two Years", "Five Years" };
+    ViewBag.Title = "Progress";
+    SelectList list = new SelectList(options);
+    ViewBag.myList = list;
+}
+
+<br />
+@using (Html.BeginForm("Progress", "Weight", FormMethod.Post, new { }))
+{
+    @Html.DropDownList("ProgressList", ViewBag.myList as SelectList, new{  @class = "form-control pull-right",
+                                                                           @style = "margin-right : 26px; direction: rtl;",
+                                                                           @id = "chartChange"})
+}
+<br />
+
+<canvas id="line-chart"></canvas>
+
+<div class="row" style="margin-top : 50px; margin-bottom: -20px">
+    <h3 class="pull-left" style="margin : 15px 0 0 15px;">Entries</h3>
+    <button type="submit" class="pull-right btn btn-primary" style="margin: 10px 15px 15px 0;" data-toggle="modal" data-target="#addWeightModal">
+        Add weight
+    </button>
+    <div class="modal fade" id="addWeightModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                @using (Html.BeginForm("AddWeight", "Weight", FormMethod.Post, new { }))
+                {
+                 <div class="modal-body" style="margin-left:20px;">
+
+                    <div class="form-group row" >
+                        @Html.LabelFor(m => m.TodaysWeight.Date, new { @class = "col-sm-2 control-label", style="padding-top :7px;" })
+                        @Html.TextBoxFor(m => m.TodaysWeight.Date, "{0:dd MMM yyyy}", new
+                        {
+                            @class = "form-control datepicker col-sm-10",
+                            style = "background-color:transparent; color:#fff",
+                            onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                            onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                            onchange = "$('#addWeightInputId').val('0.00');"
+                        })
+                    </div>
+               
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.TodaysWeight.Weigth, new { @class = "col-sm-2 control-label", style = "padding-top : 8px;" })
+                        @Html.TextBoxFor(x => x.TodaysWeight.Weigth, new { @class = "form-control col-sm-10 ", id = "addWeightInputId", required = "true" })
+                    </div>
+
+                 </div>
+                 <div class="modal-footer">
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                 </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<p class="text-danger" style="margin-left : 35px; display:none">
+    Weight field should contain between 0 and 2 decimals.
+    <br /> Please respect the format to be able to update.
+</p>
+
+<div>
+    @{
+        foreach (var day in Model.Weights.Reverse())
+        {
+            using (Html.BeginForm("ChangeWeight", "Weight", new { dateInput = day.Date }, FormMethod.Post,
+                                                            new { @class = "form-horizontal", role = "form", @id = "progressChangeWeightForm" }))
+            {
+                <div class="form-group">
+                    <label class="control-label col-md-2" style="font-size :16px; color:#fff"> @day.Date.ToString("dd MMM yyyy") </label>
+                    @Html.TextBox("weightInput", day.Weigth, new{   @class = "form-control col-md-10",
+                                                                    style = "background-color:transparent; color:#fff",
+                                                                    id = "changeWeightInputId",
+                                                                    onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                                                                    onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                                                                    onchange = "$(this).parents().submit();" })
+                </div>
+                <br />
+            }
+
+        }
+    }
+</div>
+
+@section scripts{
+    <script>
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('status') === "bad") {
+            $(".text-danger").toggle();
+        }
+
+        var ctx = $("#line-chart");
+        let start = new Date(), // start date chart
+            end = new Date(), // end date chart
+            data = [],
+            labels = [],
+            min = 200, // Minimum of weights
+            max = 0;   // Maximum of weights
+        setStart();
+
+        @foreach (var day in Model.Weights)
+        {
+
+            @:if (@day.Weigth < min)
+            @:min = @day.Weigth;
+            @:else if (@day.Weigth > max)
+            @:max = @day.Weigth;
+
+            @:data.push('@day.Weigth');
+            @:labels.push('@day.Date.ToString("dd/MM/yyyy")');
+         }
+        let avg = calculateAvg(data);
+
+        let chart = new Chart(ctx, {
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'line',
+                        label: 'Weight',
+                        showLine: true,
+                        fill: false,
+                        data: data,
+                        lineTension: 0,
+                        pointBorderWidth: 2,
+                        borderColor: '#66fcf1',
+                        pointBackgroundColor: 'red',
+                        radius: 4,
+                    },
+                    {
+                        type: 'line',
+                        label: 'Average',
+                        hidden: true,
+                        borderCapStyle: 'round',
+                        showLine: true,
+                        fill: false,
+                        data: avg,
+                        lineTension: 0.5,
+                        pointBorderWidth: 2,
+                        borderColor: 'red',
+                        pointBackgroundColor: '#66fcf1',
+                        radius: 0,
+                        borderWidth: 2,
+                        borderDash: [10, 13]
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    labels: {
+                        fontColor: "#fff",
+                        fontSize: 16
+                    }
+                },
+                tooltips: {
+                    mode: 'label',
+                    backgroundColor: "red",
+                    titleFontColor: '#fff',
+                    bodyFontColor : '#fff'
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                    },
+                scales: {
+                    xAxes: [{
+                        type : "time",
+                        display: true,
+                        time: {
+                            parser: 'DD/MM/YYYY',
+                            tooltipFormat: 'll',
+                            unit: 'day',
+                            displayFormats: {
+                                day: 'MMM DD'
+                            },
+                            min: start,
+                            max: end
+                        },
+                        ticks: {
+                            fontColor: "#fff",
+                            fontSize: 14
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            fontColor: "#fff",
+                            stepSize: 1,
+                            suggestedMin: parseInt(min)-1,
+                            suggestedMax: parseInt(max)+1
+                        },
+                        gridLines: {
+                            color: '#999',
+                            lineWidth: 0.3
+                        },
+                        scaleLabel: {
+                            display: true,
+                            fontSize : 14,
+                            fontColor: '#fff',
+                            labelString: 'Kg'
+                        }
+                    }]
+                }
+            }
+
+            });
+
+        // Set start for chart when a value is selected from dropdown list
+        $('#chartChange').change(function () {
+            let btn = document.getElementById('chartChange');
+            let value = btn.options[btn.selectedIndex].text;
+            let todaysDate = new Date();
+            start.setFullYear(todaysDate.getFullYear());
+
+            switch (value) {
+                case "One Week":
+                    start.setDate(todaysDate.getDate() - 6);
+                    start.setMonth(todaysDate.getMonth());
+                    break;
+                case "One Month":
+                    start.setMonth(todaysDate.getMonth() - 1);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "Two Months":
+                    start.setMonth(todaysDate.getMonth() - 2);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "Three Months":
+                    start.setMonth(todaysDate.getMonth() - 3);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "Six Months":
+                    start.setMonth(todaysDate.getMonth() - 6);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "One Year":
+                    start.setMonth(todaysDate.getMonth() - 12);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "Two Years":
+                    start.setMonth(todaysDate.getMonth() - 24);
+                    start.setDate(todaysDate.getDate());
+                    break;
+                case "Five Years":
+                    start.setMonth(todaysDate.getMonth() - 60);
+                    start.setDate(todaysDate.getDate());
+                    break;
+
+            }
+            start.setHours(0, 0, 0, 0);
+            chart.update();
+        });
+
+        $('.datepicker').datepicker({
+            dateFormat: 'dd M yy',
+            changeMonth: true,
+            changeYear: true,
+            maxDate: 0,
+            firstDay: 1,
+            yearRange: "-70:+0",
+            beforeShow: function () {
+                setTimeout(
+                    function () {
+                        $('#ui-datepicker-div').css('z-index', 99999);
+                    }, 100
+                )
+            }
+        });
+
+        function calculateAvg(data) {
+            let avg = [];
+            // Parse array of strings to array of floats
+            data = data.toString().match(/\d+(?:\.\d+)?/g).map(Number);
+
+            // Calculate average for each unit
+            for (let i = 0; i < data.length; i++) {
+                let divider = 7, j = 6;
+
+                if (avg.length + 1 < 7) {
+                    divider = avg.length + 1;
+                }
+                if (avg.length < 7) {
+                    j = avg.length;
+                }
+
+                avg[i] = (data.slice(i - j, i + 1).reduce((a, b) => a + b, 0)) / divider;
+            }
+
+            // Parse array back to array of strings
+            for (let i = 0; i < avg.length; i++) {
+                avg[i] = avg[i].toFixed(2);
+            }
+
+            return avg;
+        }
+
+        function setStart() {
+            start.setDate(start.getDate() - 6);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+        }
+    });
+</script>
+}
+
+@section Quote{
+    Enjoy the journey to the peek.
+}

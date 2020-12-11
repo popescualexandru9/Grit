@@ -11,10 +11,13 @@ namespace Grit
             bundles.Add(new ScriptBundle("~/bundles/lib").Include(
                         "~/Scripts/bootstrap.js",
                         "~/Scripts/bootbox.js",
+                        "~/Scripts/moment.js",
                         "~/Scripts/jquery-{version}.js",
                         "~/Scripts/jquery-ui/jquery-ui.js",
                         "~/Scripts/datatables/jquery.datatables.js",
-                        "~/Scripts/datatables/datatables.bootstrap.js"
+                        "~/Scripts/datatables/datatables.bootstrap.js",
+                         "~/Scripts/Chart.js",
+                         "~/Scripts/chartjs-annotation/chartjs-plugin-annotation.js"
                         )); 
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
@@ -28,7 +31,8 @@ namespace Grit
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/site.css",
                       "~/Content/bootstrap.css",
-                      "~/Content/datatables/css/datatables.bootstrap.css"
+                      "~/Content/datatables/css/datatables.bootstrap.css",
+                      "~/Content/Chart.css"
                       ));
         }
     }

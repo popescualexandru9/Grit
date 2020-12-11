@@ -30,16 +30,19 @@
         @foreach (var both in Model.Users.Zip(Model.RoleName, (user, rolename) => new { user, rolename }))
         {
         <tr>
-            <th scope="col"> @Html.ActionLink(both.user.UserName, "MemberDetails", "Account", new { id = both.user.Id }, new { @class = "memberTableLink" })</th>
+            <th scope="col"> @Html.ActionLink(both.user.UserName, "MemberDetails", "Account", new { id = both.user.Id }, 
+                                                                                              new { @class = "memberTableLink" })</th>
             <th scope="col"> @both.user.Email</th>
 
             @if (User.IsInRole("Admin"))
             {
-                <th scope="col"> @Html.ActionLink(both.rolename, "ChangeRole", "Account", new { id = both.user.Id }, new { @class = "memberTableLink" })</th>
+                <th scope="col"> @Html.ActionLink(both.rolename, "ChangeRole", "Account", new { id = both.user.Id }, 
+                                                                                          new { @class = "memberTableLink" })</th>
 
                 if (!both.rolename.Equals("Admin"))
                 {
-                    <th scope="col"> @Html.ActionLink("Delete user", "DeleteMember", "Account", new { id = both.user.Id }, new { @class = "deleteMemberLink" })</th>
+                    <th scope="col"> @Html.ActionLink("Delete user", "DeleteMember", "Account", new { id = both.user.Id }, 
+                                                                                                new { @class = "deleteMemberLink" })</th>
                 }
                 else
                 {

@@ -3,8 +3,12 @@
     ViewBag.Title = "Member Details ";
 }
 
-<div class="alert alert-success" id="alertMessage" style="display:none">
+<div class="alert alert-success" id="alertMessageOk" style="display:none">
     <strong>Updated succssesfully!</strong>
+</div>
+
+<div class="alert alert-danger" id="alertMessageBad" style="display:none">
+    <strong>UserName must be unique!</strong>
 </div>
 
 
@@ -126,12 +130,19 @@
 
 
         if (status === "ok") {
-            showAlert();
+            showAlertOk();
+        } if (status === "bad") {
+            showAlertBad();
         }
 
-        function showAlert() {
-            $("#alertMessage").fadeTo(1000, 1).delay(1500).slideUp(500, function () {
-                $("#alertMessage").slideUp(500);
+        function showAlertOk() {
+            $("#alertMessageOk").fadeTo(1000, 1).delay(1500).slideUp(500, function () {
+                $("#alertMessageOk").slideUp(500);
+            });
+        };
+        function showAlertBad() {
+            $("#alertMessageBad").fadeTo(1000, 1).delay(1500).slideUp(500, function () {
+                $("#alertMessageBad").slideUp(500);
             });
         };
     </script>

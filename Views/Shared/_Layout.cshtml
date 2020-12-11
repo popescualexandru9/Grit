@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Training", "Index", "Home")</li>
                     <li>@Html.ActionLink("Timer", "Timer", "Home")</li>
-                    <li>@Html.ActionLink("Progress", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Progress", "Progress", "Weight")</li>
                     <li>@Html.ActionLink("Calendar", "About", "Home")</li>
 
                     @if (User.Identity.IsAuthenticated)
@@ -50,7 +50,6 @@
                     <p class="col-xs-12" style="margin-top : 10px">&copy; @DateTime.Now.Year - Grit by Popescu Alexandru</p>
                 </div>
                 <div class="column col-xs-6">
-                 
                     <p class="text-right col-xs-12" id="footer_quote">@RenderSection("Quote", false) </p>
                 </div>
                 

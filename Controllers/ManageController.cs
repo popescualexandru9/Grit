@@ -17,6 +17,7 @@ namespace Grit.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ApplicationDbContext _context;
+        private WeightController weightController;
 
 
         #region providedRegion
@@ -63,6 +64,7 @@ namespace Grit.Controllers
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
                 : message == ManageMessageId.UpdateSuccess ? "Your profile has been updated successfully."
+                : message == ManageMessageId.UserNameTaken ? "Oops, this username is already taken. Try another one!"
                 : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
@@ -398,6 +400,7 @@ namespace Grit.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
+            UserNameTaken,
             Error
         }
 
@@ -426,6 +429,7 @@ namespace Grit.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Update (MemberDetailsViewModel model)
         {
+            int weightEntityId;
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -438,33 +442,38 @@ namespace Grit.Controllers
                 throw new HttpException(404, "Can't find user by email.");
             }
 
-            // Format weight and height to always have 2 decimals
-            decimal weight = decimal.Parse(model.Weight.Weigth.ToString("F"));
-            decimal height = decimal.Parse((model.User.Height ?? 0).ToString("F"));
-
-            weight = Math.Round(weight, 2);
-
-            // Search for weight in database and store its id
-            int weightEntityId;
-            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
-
-            if (weightEntity == null)
+            if (!user.UserName.Equals(model.User.UserName))
             {
-                // If not found, create new weight
-                WeightController weightController = new WeightController();
-                weightEntityId = weightController.Create(weight);
+                if (UserManager.FindByName(model.User.UserName) != null)
+                {
+                    return RedirectToAction("Index", new
+                    {
+                        Message = ManageMessageId.UserNameTaken
+                    });
+                }
+            }
+
+            // Format weight and height to always have 2 decimals
+            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")),2);
+            decimal height = Math.Round(decimal.Parse((model.User.Height ?? 0).ToString("F")),2);
+
+            // Search if any weight was already registered today
+            var timeFrame = DateTime.Now.AddDays(-1);
+            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(x.Date, timeFrame) > 0).SingleOrDefault();
+            if (weightEntity != null)
+            {
+                // If found, rewrite it
+                weightEntity.Weigth = weight;
+                weightEntityId = weightEntity.Id;
+                _context.SaveChanges();
             }
             else
-                weightEntityId = weightEntity.Id;
+            {   // Create new weight and store its id
+                weightController = new WeightController();
+                weightEntityId = weightController.Create(weight, user.Id);
+            }
 
-
-            // Asign values to user
-            user.UserName = model.User.UserName;
-            user.DailyWeight_Id = weightEntityId;
-            user.Height = Math.Round(height, 2);
-            user.Birthdate = model.User.Birthdate;
-
-            UserManager.Update(user);
+            UpdateUser(user, model.User.UserName, weightEntityId, height, model.User.Birthdate);
             return RedirectToAction("Index", new
             {
                 Message = ManageMessageId.UpdateSuccess
@@ -478,6 +487,16 @@ namespace Grit.Controllers
             if (signUpDate.Date > DateTime.Today.AddYears(-age)) age--;
 
             return age;
+        }
+
+        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate)
+        {
+            user.UserName = username;
+            user.DailyWeight_Id = weightEntityId;
+            user.Height = height;
+            user.Birthdate = birthdate;
+
+            UserManager.Update(user);
         }
         #endregion
 

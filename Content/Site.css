@@ -95,7 +95,7 @@ textarea {
     font-weight: 600;
 }
 
-@media (min-width: 970px) {
+@media (min-width: 990px) {
     #start_button_timer {
         margin-right: 5px;
     }
@@ -105,7 +105,7 @@ textarea {
     font-family: 'Gloria Hallelujah', cursive;
     font-size: 18px;
     color: #ffffff;
-    padding-right: 35px;
+    padding-right: 5px;
 }
 
 #fillInForm .form-group .input-group {
@@ -164,7 +164,7 @@ table tr a:hover {
     }
 }
 
-#alertMessage{
+#alertMessageOk, #alertMessageBad{
     line-height: 30px;
     height :60px;
     position : absolute;
@@ -175,4 +175,8 @@ table tr a:hover {
 
 dt{
     color :#fff;
+}
+
+#progressChangeWeightForm {
+    margin-left: -50px;
 }

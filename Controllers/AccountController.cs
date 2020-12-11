@@ -22,6 +22,7 @@ namespace Grit.Controllers
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
         private ApplicationDbContext _context;
+        private WeightController weightController;
 
         #region providedRegion
         public AccountController()
@@ -83,6 +84,12 @@ namespace Grit.Controllers
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
             var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
@@ -513,6 +520,7 @@ namespace Grit.Controllers
         [Route("Account/FillInfo/{emailUser}/{emailHost}")]
         public async Task<ActionResult> FillInfo(FillInfoViewModel model, string emailUser, string emailHost)
         {
+            int weightEntityId;
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -526,36 +534,14 @@ namespace Grit.Controllers
                 throw new HttpException(404, "Can't find user by email.");
             }
 
-
             // Format weight and height to always have 2 decimals
-  
-            model.DailyWeight = decimal.Parse(model.DailyWeight.ToString("F"));
-            model.Height = decimal.Parse(model.Height.ToString("F"));
+            decimal weight = Math.Round(decimal.Parse(model.DailyWeight.ToString("F")),2);
+            decimal height = Math.Round(decimal.Parse(model.Height.ToString("F")),2);
 
-            decimal weight = Math.Round(model.DailyWeight, 2);
+            // Create new weight object in database
+            weightEntityId = weightController.Create(weight,user.Id);
 
-            // Search for weight in database and store its id
-            int weightEntityId;
-            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
-            
-            if (weightEntity == null)
-            {
-                // If not found, create new weight
-                WeightController weightController = new WeightController();
-                weightEntityId = weightController.Create(weight);
-            }
-            else
-                weightEntityId = weightEntity.Id;
-            
-
-            // Asign values to user
-            user.DailyWeight_Id = weightEntityId;
-            user.Height = Math.Round(model.Height, 2);
-            user.Birthdate = model.Birthdate;
-            user.Gender = model.Gender;
-            user.SignUpDate = DateTime.Now;
-
-            UserManager.Update(user);
+            UpdateUser(user, user.UserName, weightEntityId, height, model.Birthdate, model.Gender, DateTime.Now);
             return RedirectToAction("Index", "Home");
         }
 
@@ -621,6 +607,7 @@ namespace Grit.Controllers
         [Authorize(Roles = "Employee, Admin")]
         public async Task<ActionResult> MemberDetails(MemberDetailsViewModel model)
         {
+            int weightEntityId;
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -633,34 +620,39 @@ namespace Grit.Controllers
                 throw new HttpException(404, "Can't find user by email.");
             }
 
-            // Format weight and height to always have 2 decimals
-            decimal weight = decimal.Parse(model.Weight.Weigth.ToString("F"));
-            decimal height = decimal.Parse((model.User.Height??0).ToString("F"));
 
-            weight = Math.Round(weight, 2);
-
-            // Search for weight in database and store its id
-            int weightEntityId;
-            var weightEntity = _context.Weights.SingleOrDefault(x => x.Weigth == weight);
-
-            if (weightEntity == null)
+            if (!user.UserName.Equals(model.User.UserName))
             {
-                // If not found, create new weight
-                WeightController weightController = new WeightController();
-                weightEntityId = weightController.Create(weight);
+                if (UserManager.FindByName(model.User.UserName) != null)
+                {
+                    return RedirectToAction("MemberDetails", "Account", new { id = user.Id, status = "bad" });
+                }
+            } 
+
+            // Format weight and height to always have 2 decimals
+            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")),2);
+            decimal height = Math.Round(decimal.Parse((model.User.Height??0).ToString("F")),2);
+
+
+            // Search if any weight was already registered today
+            var timeFrame = DateTime.Now.AddDays(-1);
+            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(x.Date, timeFrame) >0 ).SingleOrDefault();
+            if (weightEntity != null)
+            {
+                // If found, rewrite it
+                weightEntity.Weigth = weight;
+                weightEntityId = weightEntity.Id;
+                _context.SaveChanges();
             }
             else
-                weightEntityId = weightEntity.Id;
+            {   // Create new weight and store its id
+                weightController = new WeightController();
+                weightEntityId = weightController.Create(weight, user.Id);
+            }
+            
 
 
-            // Asign values to user
-            user.UserName = model.User.UserName;
-            user.DailyWeight_Id = weightEntityId;
-            user.Height = Math.Round(height, 2);
-            user.Birthdate = model.User.Birthdate;
-            user.Gender = model.User.Gender;
-
-            UserManager.Update(user);
+            UpdateUser(user, model.User.UserName, weightEntityId, height, model.User.Birthdate, model.User.Gender, model.User.SignUpDate);
             return RedirectToAction("MemberDetails", "Account", new {id = user.Id, status="ok"});
         }
 
@@ -693,7 +685,6 @@ namespace Grit.Controllers
             var user = _context.Users.SingleOrDefault(x => x.Id.Equals(model.User.Id));
             if (user == null)
             {
-                // Don't reveal that the user does not exist
                 throw new HttpException(404, "Can't find user by id.");
             }
             var result = await UserManager.RemoveFromRoleAsync(user.Id, previousRole);
@@ -701,6 +692,17 @@ namespace Grit.Controllers
             return RedirectToAction("Members", "Account");
         }
 
+        private void UpdateUser(ApplicationUser user, string username,int  weightEntityId, decimal height ,DateTime? birthdate, string gender, DateTime? signUpDate)
+        {
+            user.UserName = username;
+            user.DailyWeight_Id = weightEntityId;
+            user.Height = height;
+            user.Birthdate = birthdate;
+            user.Gender = gender;
+            user.SignUpDate = signUpDate;
+
+            UserManager.Update(user);
+        }
         #endregion
     }
 }

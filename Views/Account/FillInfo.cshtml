@@ -77,24 +77,23 @@
 @section scripts{
     <script>
         $(document).ready(function () {
-
-            $(function () {
-                $('.datepicker').datepicker({
-                    dateFormat: 'dd M yy',
-                    changeMonth: true,
-                    changeYear: true,
-                    maxDate: 0,
-                    firstDay: 1,
-                    yearRange: "-70:+0",
-                    beforeShow: function () {
-                        setTimeout(
-                            function () {
-                                $('#ui-datepicker-div').css('z-index', 99999);
-                            }, 100
-                        )
-                    }
-                });
+   
+            $('.datepicker').datepicker({
+                dateFormat: 'dd M yy',
+                changeMonth: true,
+                changeYear: true,
+                maxDate: 0,
+                firstDay: 1,
+                yearRange: "-70:+0",
+                beforeShow: function () {
+                    setTimeout(
+                        function () {
+                            $('#ui-datepicker-div').css('z-index', 99999);
+                        }, 100
+                    )
+                }
             });
+     
         });
 
     </script>
