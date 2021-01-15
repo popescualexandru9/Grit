@@ -84,23 +84,23 @@ textarea {
     transform: scaleX(-1);
 }
 
+
+/* Timer Page*/
 .start_reset_timer {
     color: white;
     font-size: 20px;
 }
-
-
 .seconds_timer {
     font-size: 18px;
     font-weight: 600;
 }
-
 @media (min-width: 990px) {
     #start_button_timer {
         margin-right: 5px;
     }
 }
 
+/* Footer Quote */
 #footer_quote {
     font-family: 'Gloria Hallelujah', cursive;
     font-size: 18px;
@@ -108,32 +108,23 @@ textarea {
     padding-right: 5px;
 }
 
+/* Fill info form Page */
 #fillInForm .form-group .input-group {
     width: 322px;
 }
-
 #fillInForm .form-group .input-group .input-group-addon {
     width: 42px;
 }
 
+/* Memebrs Page*/
 table > thead {
     color: #ededed;
     font-size: 17px;
 }
-
-.deleteMemberLink {
+.deleteMemberLink, .memberTableLink {
     color: #ccc;
 }
-
-.memberTableLink {
-    color: #ccc;
-}
-
-table tr a:hover {
-    color: #000000;
-}
-
-.ui-datepicker-calendar > thead > tr {
+table tr a:hover, .ui-datepicker-calendar > thead > tr {
     color: #000000;
 }
 .readonly
@@ -146,7 +137,6 @@ table tr a:hover {
     margin-right: 139px;
     display: inline-block;
 }
-
 #buttonUpdate {
     display: inline-block;
 }
@@ -157,13 +147,11 @@ table tr a:hover {
 
     }
 }
-
 @media (min-width : 1200px) {
     #buttonCancel {
         margin-left: 143px;
     }
 }
-
 #alertMessageOk, #alertMessageBad{
     line-height: 30px;
     height :60px;
@@ -172,11 +160,317 @@ table tr a:hover {
     display : inline-block;
     
 }
-
 dt{
     color :#fff;
 }
 
+/* Progress Page*/
 #progressChangeWeightForm {
-    margin-left: -50px;
+    margin-left: 20px;
 }
+@media (min-width : 992px) {
+    #progressChangeWeightForm {
+        margin-left: -60px;
+    }
+}
+
+#panelProgress{
+    color : #ddd;
+}
+#panelProgress dt {
+    text-align: left;
+    margin-top:5px;
+}
+
+#panelProgress dd {
+    text-align: right;
+    margin-top: 5px;
+    margin-right: 15px;
+}
+
+@media( max-width: 768px){
+    #panelProgress dd {
+        text-align: left;
+        margin-top: 5px;
+        margin-left: 10px;
+    }
+}
+
+/* Training Page*/
+.panelTraining {
+    -webkit-box-shadow: 0 2px 2px 2px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 2px 2px rgba(255, 255, 255, 0.5);
+}
+
+.panel-body {
+    border: 1px solid #ddd !important;
+}
+
+.panel-heading > p {
+    margin: 5px 0 5px 0;
+    color: #fff;
+    text-decoration: none;
+    font-size: 25px;
+}
+
+.panelBody, .panelBody2 {
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 10px;
+    height: 255px;
+    overflow: hidden;
+    cursor: pointer;
+    transform: scaleY(1.03);
+}
+
+.panelBody > .title, .panelBody2 > .title {
+    text-align: center;
+    font-size: 25px;
+    color: #FFF;
+}
+
+.panelBody2 > a {
+    font-size: 200px;
+    top: -8px;
+    padding-left: 11px;
+    user-select: none;
+}
+
+.panelBody2 > a:hover {
+    text-decoration: none;
+}
+
+.panelBody2 > a:hover:before {
+    color: #66fcf1;
+    text-decoration: none;
+}
+
+.subtitle {
+    color: #fff;
+    font-size: 16px;
+}
+
+
+.highLight {
+    border: 2px solid #fff;
+    transform: scaleY(0.96);
+}
+
+
+/* Training panel hrizontal scroll*/
+
+@media (min-width : 992px) {
+    #collapseBody > .row {
+        white-space: nowrap;
+        overflow: hidden;
+        -webkit-user-select: none; /* Chrome all and Safari all */
+        -moz-user-select: none; /* Firefox all */
+        -ms-user-select: none; /* Internet Explorer 10 and later */
+        user-select: none; /* Likely future */
+    }
+
+    #collapseBody > .row > .col-md-4 {
+        display: inline-block;
+        float: none;
+        white-space: normal;
+    }
+
+
+    .highLight {
+        border: 2px solid #fff;
+        transform: scale(1.03, 1.05);
+    }
+}
+
+
+/* Training panel program bar */
+
+.programBar {
+    position: relative;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.programBarGoal {
+    position: absolute;
+    width: 50%;
+    background: linear-gradient(to left, rgba(195,32,26,0) 0%,#66fcf1 25%,#66fcf1 75%,#66fcf1 100%);
+    height: inherit;
+    border-radius: 10px;
+}
+
+.programBarExperience {
+    position: relative;
+    margin: 0 auto;
+    width: 45%;
+    background: linear-gradient( to right, rgba(195,32,26,0) 0%, #66fcf1 30%,#66fcf1 75%, rgba(195,32,26,0) 100%);
+    height: inherit;
+    border-radius: 10px;
+}
+
+/* Training table */
+.trainingTable{
+    margin-bottom:0px !important;
+}
+
+.trainingTable > thead > tr > th {
+    padding-left: 20px !important;
+    border: none !important;
+}
+
+.trainingTable > tbody > tr > td {
+    border: none !important;
+}
+
+.trainingTable > tbody > tr > td > select {
+    background-color: transparent !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+
+.trainingTable > tbody > tr > td > select option {
+    color: #333 !important;
+}
+
+.glyphiconCenter {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    color:#fff;
+}
+.popover {
+    color: #000;
+}
+
+.addExerciseBtns {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: #fff;
+    margin-top:15px;
+}
+
+.addExerciseBtns > a {
+    color: #66fcf1;
+    font-size : 15px;
+    font-weight:600;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.tableBtns {
+    font-size: 16px;
+    padding-top: 3px;
+    width: 60px;
+    background-color: transparent;
+    border:none;
+}
+
+@media (max-width : 620px ){
+    .trainingTable > tbody > tr > td > select::-ms-expand {
+        display: none;
+    }
+
+    .trainingTable > tbody > tr > td > select {
+        -moz-appearance: none;
+        -webkit-appearance: none;
+    }
+}
+
+@media (max-width : 550px ) {
+
+    .trainingTable {
+        min-width: 525px !important;
+    }
+
+    .fieldsets {
+        min-width: 525px !important;
+    }
+
+    #panelTraining > .panel-heading > p > em {
+        font-size: 13px !important;
+    }
+}
+
+@media (min-width : 768px ) {
+    #addExerciseModel .modal-dialog {
+        width:550px;
+    }
+}
+
+.fieldsets {
+    border: 1px solid #fff;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding-top: 0.35em;
+    padding-bottom: 0.625em;
+    padding-left: 0.75em;
+}
+
+.fieldsets > legend {
+    color :#66fcf1;
+    display: block;
+    border-style: none;
+    border-color: initial;
+    border-width: initial;
+    padding-left: 2px;
+    padding-right: 2px;
+    width: auto;
+    margin: 0px;
+}
+
+.trainingTable > thead > tr > th > button:focus, .trainingTable > tbody > tr > td> button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.disabledBtn {
+    background-color: #888888;
+    color: #fff
+}
+
+
+.disabledBtn:focus {
+    background-color: #666666;
+    color: #fff
+}
+
+#addExerciseModel{
+    cursor:wait;
+}
+
+
+
+/* Dropdown menu from panel-heading */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #0b0b0b;
+    opacity: 0.93;
+    min-width: 240px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    left: 7px;
+    top: 31px;
+    list-style-type: none;
+    padding-left: 19px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.dropdown-content > li > a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.dropdown-content li > a:hover {
+    color: #66fcf1;
+}
+
+#workoutTitle{
+    cursor:default;
+}
+

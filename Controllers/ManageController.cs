@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Grit.Models;
+using Grit.ViewModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Grit.Models;
-using Grit.ViewModels;
 
 namespace Grit.Controllers
 {
@@ -38,9 +39,9 @@ namespace Grit.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -349,7 +350,7 @@ namespace Grit.Controllers
 
             base.Dispose(disposing);
         }
-#endregion
+        #endregion
 
         #region Helpers
         // Used for XSRF protection when adding external logins
@@ -427,7 +428,7 @@ namespace Grit.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Update (MemberDetailsViewModel model)
+        public async Task<ActionResult> Update(MemberDetailsViewModel model)
         {
             int weightEntityId;
             if (!ModelState.IsValid)
@@ -454,21 +455,21 @@ namespace Grit.Controllers
             }
 
             // Format weight and height to always have 2 decimals
-            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")),2);
-            decimal height = Math.Round(decimal.Parse((model.User.Height ?? 0).ToString("F")),2);
+            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")), 2);
+            decimal height = Math.Round(decimal.Parse((model.User.Height ?? 0).ToString("F")), 2);
 
             // Search if any weight was already registered today
             var timeFrame = DateTime.Now.AddDays(-1);
-            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(x.Date, timeFrame) > 0).SingleOrDefault();
+            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
             if (weightEntity != null)
             {
-                // If found, rewrite it
+                // If found, rewrite its weight
                 weightEntity.Weigth = weight;
                 weightEntityId = weightEntity.Id;
                 _context.SaveChanges();
             }
             else
-            {   // Create new weight and store its id
+            {   // If not, create new weight and store its id
                 weightController = new WeightController();
                 weightEntityId = weightController.Create(weight, user.Id);
             }

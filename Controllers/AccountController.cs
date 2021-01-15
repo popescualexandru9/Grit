@@ -1,18 +1,16 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
+﻿using Grit.Models;
+using Grit.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
-using Grit.Models;
-using System.Net.Mail;
-using Grit.ViewModels;
-using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net.Mail;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 
 namespace Grit.Controllers
 {
@@ -30,7 +28,7 @@ namespace Grit.Controllers
             _context = new ApplicationDbContext();
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             _context = new ApplicationDbContext();
             UserManager = userManager;
@@ -43,9 +41,9 @@ namespace Grit.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -135,7 +133,7 @@ namespace Grit.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -170,9 +168,9 @@ namespace Grit.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-
+              
                     await UserManager.AddToRoleAsync(user.Id, "Member");
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
@@ -184,9 +182,8 @@ namespace Grit.Controllers
                     string emailUser = addr.User;
                     int index = addr.Host.LastIndexOf(".");
                     string emailHost = addr.Host.Substring(0, index);
-                    
-                   
-                    return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser , emailHost = emailHost});
+
+                    return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser, emailHost = emailHost });
                 }
                 AddErrors(result);
             }
@@ -398,7 +395,12 @@ namespace Grit.Controllers
                     if (result.Succeeded)
                     {
                         await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                        return RedirectToLocal(returnUrl);
+                        MailAddress addr = new MailAddress(model.Email);
+                        string emailUser = addr.User;
+                        int index = addr.Host.LastIndexOf(".");
+                        string emailHost = addr.Host.Substring(0, index);
+
+                        return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser, emailHost = emailHost });
                     }
                 }
                 AddErrors(result);
@@ -526,6 +528,7 @@ namespace Grit.Controllers
                 return View(model);
             }
 
+            // Parse email from url back into email form
             string email = emailUser + "@" + emailHost + ".com";
             var user = await UserManager.FindByNameAsync(email);
             if (user == null)
@@ -535,30 +538,32 @@ namespace Grit.Controllers
             }
 
             // Format weight and height to always have 2 decimals
-            decimal weight = Math.Round(decimal.Parse(model.DailyWeight.ToString("F")),2);
-            decimal height = Math.Round(decimal.Parse(model.Height.ToString("F")),2);
+            decimal weight = Math.Round(decimal.Parse(model.DailyWeight.ToString("F")), 2);
+            decimal height = Math.Round(decimal.Parse(model.Height.ToString("F")), 2);
 
             // Create new weight object in database
-            weightEntityId = weightController.Create(weight,user.Id);
+            weightController = new WeightController();
+            weightEntityId = weightController.Create(weight, user.Id);
 
             UpdateUser(user, user.UserName, weightEntityId, height, model.Birthdate, model.Gender, DateTime.Now);
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize (Roles = "Employee, Admin")]
+        [Authorize(Roles = "Employee, Admin")]
         [Route("Account/Members")]
         public ActionResult Members()
         {
             var users = _context.Users.ToList();
             IList<string> roles = new List<string>();
-            foreach ( var user in users)
+            foreach (var user in users)
             {
+                // For each user get his role
                 roles.Add(UserManager.GetRoles(user.Id).FirstOrDefault());
             }
 
             var membersModel = new MembersViewModel
             {
-                Users =  users,
+                Users = users,
                 RoleName = roles
             };
 
@@ -592,7 +597,7 @@ namespace Grit.Controllers
                 // Don't reveal that the user does not exist
                 throw new HttpException(404, "Can't find user by id.");
             }
-   
+
             var detailsModel = new MemberDetailsViewModel
             {
                 User = user,
@@ -627,33 +632,32 @@ namespace Grit.Controllers
                 {
                     return RedirectToAction("MemberDetails", "Account", new { id = user.Id, status = "bad" });
                 }
-            } 
+            }
 
             // Format weight and height to always have 2 decimals
-            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")),2);
-            decimal height = Math.Round(decimal.Parse((model.User.Height??0).ToString("F")),2);
+            decimal weight = Math.Round(decimal.Parse(model.Weight.Weigth.ToString("F")), 2);
+            decimal height = Math.Round(decimal.Parse((model.User.Height ?? 0).ToString("F")), 2);
 
 
-            // Search if any weight was already registered today
+            // Search if any weight was already registered today for this user
             var timeFrame = DateTime.Now.AddDays(-1);
-            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(x.Date, timeFrame) >0 ).SingleOrDefault();
+            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
+
             if (weightEntity != null)
             {
-                // If found, rewrite it
+                // If found, rewrite its weight
                 weightEntity.Weigth = weight;
                 weightEntityId = weightEntity.Id;
                 _context.SaveChanges();
             }
             else
-            {   // Create new weight and store its id
+            {   // If not, create new weight and store its id
                 weightController = new WeightController();
                 weightEntityId = weightController.Create(weight, user.Id);
             }
-            
-
 
             UpdateUser(user, model.User.UserName, weightEntityId, height, model.User.Birthdate, model.User.Gender, model.User.SignUpDate);
-            return RedirectToAction("MemberDetails", "Account", new {id = user.Id, status="ok"});
+            return RedirectToAction("MemberDetails", "Account", new { id = user.Id, status = "ok" });
         }
 
 
@@ -692,7 +696,7 @@ namespace Grit.Controllers
             return RedirectToAction("Members", "Account");
         }
 
-        private void UpdateUser(ApplicationUser user, string username,int  weightEntityId, decimal height ,DateTime? birthdate, string gender, DateTime? signUpDate)
+        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate, string gender, DateTime? signUpDate)
         {
             user.UserName = username;
             user.DailyWeight_Id = weightEntityId;
@@ -702,7 +706,31 @@ namespace Grit.Controllers
             user.SignUpDate = signUpDate;
 
             UserManager.Update(user);
+            AddSplitsToUser(user);
         }
         #endregion
+
+        private void AddSplitsToUser(ApplicationUser user)
+        {
+            var trainingSplitFullBody = _context.TrainingSplits.Where(x => x.Id == 1008).SingleOrDefault();
+            var trainingSplitPpl = _context.TrainingSplits.Where(x => x.Id == 1012).SingleOrDefault();
+
+
+            var userSplitFullBody = new UserSplit
+            {
+                UserID = user.Id,
+                SplitID = trainingSplitFullBody.Id
+            };
+
+            var userSplitPpl= new UserSplit
+            {
+                UserID = user.Id,
+                SplitID = trainingSplitPpl.Id
+            };
+
+            _context.UserSplits.Add(userSplitFullBody);
+            _context.UserSplits.Add(userSplitPpl);
+            _context.SaveChanges();
+        }
     }
 }

@@ -54,10 +54,77 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Http.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Features, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Http.Features.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Mvc.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNetCore.Routing.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Routing.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Http, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Http.5.0.0\lib\net461\Microsoft.Extensions.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.5.0.0\lib\net461\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Options.5.0.0\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Net.Http.Headers.2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Diagnostics.DiagnosticSource.5.0.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.5.0.0\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.5.0.0\lib\net461\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -110,6 +177,15 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Abstractions, Version=5.11.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>packages\Unity.5.11.1\lib\net47\Unity.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.11.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>packages\Unity.5.11.1\lib\net47\Unity.Container.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.WebApi, Version=5.4.0.0, Culture=neutral, PublicKeyToken=43da31bc42a85347, processorArchitecture=MSIL">
+      <HintPath>packages\Unity.WebAPI.5.4.0\lib\net45\Unity.WebApi.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
@@ -182,8 +258,10 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ExerciseApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -202,17 +280,71 @@
     <Compile Include="Migrations\202012081525150_addUserIdToWeightTable.designer.cs">
       <DependentUpon>202012081525150_addUserIdToWeightTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202012160223013_addTrainingTables.cs" />
+    <Compile Include="Migrations\202012160223013_addTrainingTables.designer.cs">
+      <DependentUpon>202012160223013_addTrainingTables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012161933005_expectedWeightToString.cs" />
+    <Compile Include="Migrations\202012161933005_expectedWeightToString.designer.cs">
+      <DependentUpon>202012161933005_expectedWeightToString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012171509402_trainingActiveField.cs" />
+    <Compile Include="Migrations\202012171509402_trainingActiveField.designer.cs">
+      <DependentUpon>202012171509402_trainingActiveField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012241450353_addConstructors.cs" />
+    <Compile Include="Migrations\202012241450353_addConstructors.designer.cs">
+      <DependentUpon>202012241450353_addConstructors.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012241526232_addExpectedRepsToExercise.cs" />
+    <Compile Include="Migrations\202012241526232_addExpectedRepsToExercise.designer.cs">
+      <DependentUpon>202012241526232_addExpectedRepsToExercise.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012250110257_repairRelationSchema.cs" />
+    <Compile Include="Migrations\202012250110257_repairRelationSchema.designer.cs">
+      <DependentUpon>202012250110257_repairRelationSchema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012261829363_repairRelationSchemaForReal.cs" />
+    <Compile Include="Migrations\202012261829363_repairRelationSchemaForReal.designer.cs">
+      <DependentUpon>202012261829363_repairRelationSchemaForReal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012270212138_ExercisesActualNulls.cs" />
+    <Compile Include="Migrations\202012270212138_ExercisesActualNulls.designer.cs">
+      <DependentUpon>202012270212138_ExercisesActualNulls.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202012281618257_MapM2M.cs" />
+    <Compile Include="Migrations\202012281618257_MapM2M.designer.cs">
+      <DependentUpon>202012281618257_MapM2M.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101041403426_ActiveWorkoutId.cs" />
+    <Compile Include="Migrations\202101041403426_ActiveWorkoutId.designer.cs">
+      <DependentUpon>202101041403426_ActiveWorkoutId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101081945365_IntToDecimalActualWeight.cs" />
+    <Compile Include="Migrations\202101081945365_IntToDecimalActualWeight.designer.cs">
+      <DependentUpon>202101081945365_IntToDecimalActualWeight.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Exercise.cs" />
+    <Compile Include="Models\ExerciseResponse.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Controllers\TrainingSplitController.cs" />
+    <Compile Include="Models\TrainingSplit.cs" />
+    <Compile Include="Models\UserSplit.cs" />
     <Compile Include="Models\Weight.cs" />
+    <Compile Include="Models\Workout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\OpenExerciseException.cs" />
+    <Compile Include="Services\OpenExerciseResponse.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\MemberDetailsViewModel.cs" />
     <Compile Include="ViewModels\MemberProfileViewModel.cs" />
     <Compile Include="ViewModels\MembersViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
+    <Compile Include="ViewModels\AddSplitViewModel.cs" />
+    <Compile Include="ViewModels\TrainingViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -425,6 +557,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\common.scss" />
+    <Content Include="AppSettings.config" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -443,7 +576,6 @@
     <Content Include="Scripts\jquery-ui\images\ui-icons_cccccc_256x240.png" />
     <Content Include="Scripts\jquery-ui\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Scripts\jquery-ui\package.json" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-ui\AUTHORS.txt" />
     <Content Include="Scripts\jquery-ui\external\jquery\jquery.js" />
     <Content Include="Scripts\jquery-ui\index.html" />
@@ -456,6 +588,7 @@
     <Content Include="Scripts\jquery-ui\jquery-ui.theme.css" />
     <Content Include="Scripts\jquery-ui\jquery-ui.theme.min.css" />
     <Content Include="Scripts\jquery-ui\LICENSE.txt" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -588,6 +721,8 @@
     <Content Include="Views\Manage\Update.cshtml" />
     <Content Include="Views\Account\ChangeRole.cshtml" />
     <Content Include="Views\Weight\Progress.cshtml" />
+    <Content Include="Views\TrainingSplit\Training.cshtml" />
+    <Content Include="Views\TrainingSplit\AddSplit.cshtml" />
     <Content Include="Scripts\moment.min.js.map" />
     <Content Include="Scripts\moment-with-locales.min.js.map" />
   </ItemGroup>
@@ -614,6 +749,39 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202012081525150_addUserIdToWeightTable.resx">
       <DependentUpon>202012081525150_addUserIdToWeightTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012160223013_addTrainingTables.resx">
+      <DependentUpon>202012160223013_addTrainingTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012161933005_expectedWeightToString.resx">
+      <DependentUpon>202012161933005_expectedWeightToString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012171509402_trainingActiveField.resx">
+      <DependentUpon>202012171509402_trainingActiveField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012241450353_addConstructors.resx">
+      <DependentUpon>202012241450353_addConstructors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012241526232_addExpectedRepsToExercise.resx">
+      <DependentUpon>202012241526232_addExpectedRepsToExercise.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012250110257_repairRelationSchema.resx">
+      <DependentUpon>202012250110257_repairRelationSchema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012261829363_repairRelationSchemaForReal.resx">
+      <DependentUpon>202012261829363_repairRelationSchemaForReal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012270212138_ExercisesActualNulls.resx">
+      <DependentUpon>202012270212138_ExercisesActualNulls.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202012281618257_MapM2M.resx">
+      <DependentUpon>202012281618257_MapM2M.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101041403426_ActiveWorkoutId.resx">
+      <DependentUpon>202101041403426_ActiveWorkoutId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101081945365_IntToDecimalActualWeight.resx">
+      <DependentUpon>202101081945365_IntToDecimalActualWeight.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

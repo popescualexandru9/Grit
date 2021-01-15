@@ -14,6 +14,7 @@ namespace Grit
                         "~/Scripts/moment.js",
                         "~/Scripts/jquery-{version}.js",
                         "~/Scripts/jquery-ui/jquery-ui.js",
+                        "~/Scripts/jquery.validate.js",
                         "~/Scripts/datatables/jquery.datatables.js",
                         "~/Scripts/datatables/datatables.bootstrap.js",
                          "~/Scripts/Chart.js",

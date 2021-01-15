@@ -16,9 +16,9 @@
         <h2>Choose a training plan</h2>
         <p>
             Track your intensity in the gym!<br />
-            Sets, reps, and even your weights. The app intelligently pushes you to lift more each week.
+            Sets, reps, and even your weights. The app intelligently pushes you to lift more each week.<br />You can also create your own routine to maximize your performance in the gym. <br />
         </p>
-        <p>@Html.ActionLink("Start now »", "FillInfo", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary" })</p>
+        <p>@Html.ActionLink("Start now »", "Training", "TrainingSplit", routeValues: null, htmlAttributes: new { @class = "btn btn-primary" })</p>
     </div>
     <div class="col-md-4">
         <h2>Time your workouts</h2>
@@ -42,30 +42,3 @@
     <script src="@Url.Content("~/Scripts/scripts/timer.js")"></script>
 }
 
-<!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
-<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">-->
-        <!-- Modal content-->
-        <!--<div class="modal-content">
-
-            <div class="modal-body">
-                <div style="text-align: center;">
-                    <h3>Countdown Timer</h3>
-                    <div id="timer"></div>
-                    <br />
-                    <div class="row">
-                        <button class="btn btn-primary col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 seconds_timer" id="sub_timer">&#8722 15sec</button>
-                        <button class="btn col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 start_reset_timer" id="start_button_timer" style="background-color:#006b00">Start</button>
-                        <button class="btn col-xs-2 col-md-2 col-md-offset-0 start_reset_timer" id="reset_button_timer" style="background-color: #ff3e3e">Reset</button>
-                        <button class="btn btn-primary col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 seconds_timer" id="add_timer">&#43 15sec</button>
-                        <div class="col-xs-offset-1 col-md-offset-1"></div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-</div>-->

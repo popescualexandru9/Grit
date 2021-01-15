@@ -1,0 +1,542 @@
+﻿@model  Grit.ViewModels.TrainingViewModel
+@{
+    ViewBag.Title = "Training Plan";
+    SelectList RepsList = new SelectList(Enumerable.Range(1, 30));
+}
+
+@*Top panel*@
+<div class="panel panel-default" id="panelTraining">
+    <div class="panel-heading" role="button" data-toggle="collapse" data-target="#collapseBody" style="font-size : 24px;">
+
+        @if (Model.ActiveSplit == null)
+        {
+            <p>
+                Select a workout plan!
+                <span class="glyphicon glyphicon-triangle-bottom pull-right" style="top:8px;">   </span>
+            </p>
+        }
+        else
+        {
+
+            <div class="dropdown">
+                <p> <span class="glyphicon glyphicon-option-vertical pull-left dropdown-toggle" style="top: 5px; color:#66fcf1" data-toggle="dropdown" role="button"> </span></p>
+                <ul class="dropdown-content" id="activeWorkoutMenu">
+                    <li> @Html.ActionLink("New", "AddSplit", "TrainingSplit") </li>
+                    <li> <a href="#">Rename</a> </li>
+                    <li> @Html.ActionLink("Delete", "Delete", "TrainingSplit", new { id = Model.ActiveSplit.Id }, null) </li>
+                    <li> @Html.ActionLink("New from template", "AddSplit", "TrainingSplit", new { id = Model.ActiveSplit.Id }, null) </li>
+
+                </ul>
+            </div>
+
+            <p>
+                <span id="workoutTitle"> @Model.ActiveSplit.Name </span>
+                <span class="glyphicon glyphicon-triangle-bottom pull-right" style="top:8px;">   </span>
+                <span class="glyphicon glyphicon-time pull-right" style="font-size : 23px; top: 8px; right: 10px; color:#66fcf1"> </span>
+            </p>
+        }
+
+    </div>
+    @*Timer modal*@
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div style="text-align: center;">
+                        <h3>Countdown Timer</h3>
+                        <div id="timer"></div>
+                        <br />
+                        <div class="row">
+                            <button class="btn btn-primary col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 seconds_timer" id="sub_timer">&#8722 15sec</button>
+                            <button class="btn col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 start_reset_timer" id="start_button_timer" style="background-color:#006b00">Start</button>
+                            <button class="btn col-xs-2 col-md-2 col-md-offset-0 start_reset_timer" id="reset_button_timer" style="background-color: #ff3e3e">Reset</button>
+                            <button class="btn btn-primary col-xs-2 col-xs-offset-1 col-md-2 col-md-offset-1 seconds_timer" id="add_timer">&#43 15sec</button>
+                            <div class="col-xs-offset-1 col-md-offset-1"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @*Workouts list*@
+    <div id="collapseBody" class="collapse">
+        <ul class="panel-body row" style="padding-left:0">
+            @foreach (var split in Model.Splits)
+            {
+                <li class="col-md-4 panelBody">
+
+                    <p class="title"> @split.Name </p>
+                    <ul style="list-style-type: none; padding: 0; margin:0;">
+                        <li style="margin-top:15px;">
+                            <p>@split.Description</p>
+                        </li>
+                        <li style="margin-top:15px;">
+                            <p>
+                                <span class="subtitle"> Equipment : </span>  @split.Equipment <br />
+                                <span class="subtitle"> Frequency : </span> @split.Frequency Days per Week
+                            </p>
+                        </li>
+                        <li style="margin-top:20px;">
+                            <span class="subtitle"> Goal: </span>
+                            <div class="programBar">
+                                <div class="programBarGoal" data-val="@split.Goal"></div>
+                            </div>
+
+                            <div class="row">
+                                <p class="col-xs-6" style="text-align : left"> Strenght </p>
+                                <p class="col-xs-6" style="text-align : right"> Hypertrophy  </p>
+                            </div>
+                        </li>
+
+                        <li style="margin-top: 5px;">
+                            <span class="subtitle"> Experience: </span>
+                            <div class="programBar">
+                                <div class="programBarExperience" data-val="@split.Experience"></div>
+                            </div>
+                            <div class="row">
+                                <p class="col-xs-4">Beginner </p>
+                                <p class="col-xs-4" style="text-align: center; "> Intermediate </p>
+                                <p class="col-xs-4 " style="text-align: right; "> Advanced </p>
+                            </div>
+                        </li>
+                        <li class="subtitle">
+
+                            <p class="pull-right">
+                                ~ @split.Length min
+                            </p>
+                        </li>
+
+                        @Html.HiddenFor(x => split.Id, new { @class = "hiddenId" })
+                    </ul>
+                </li>
+            }
+
+
+            <li class="col-md-4 panelBody2">
+                @Html.ActionLink(" ", "AddSplit", "TrainingSplit", null, new { @class = "glyphicon glyphicon-plus glyphiconCenter", style = "margin-left:9px;" })
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+@*Pagination buttons*@
+<div style="width : 25%; margin: 0 auto 10px; text-align:center; display: none" id="scrollSpans">
+    <a href="#first"><span class="glyphicon glyphicon-record" style="margin: 5px ;color: #66FCF1;">  </span></a>
+    <a href="#last"><span class="glyphicon glyphicon-record" style="margin: 5px ;color: #66FCF1;">  </span></a>
+</div>
+
+@if (Model.ActiveSplit != null)
+{
+
+    @*Clarifications*@
+    <section>
+        <h4> Clarifications : </h4>
+        <h5>
+            This is a <strong>@Model.ActiveSplit.Goal</strong> program designed for
+            <strong>@Model.ActiveSplit.Experience</strong> lifters. It should be performed
+            <strong>@Model.ActiveSplit.Frequency</strong> days per week for about
+            <strong>@Model.ActiveSplit.Length minutes. </strong>
+        </h5>
+        <h5> @Model.ActiveSplit.Description</h5>
+    </section>
+
+
+    @*Individual workout days*@
+    foreach (var workout in Model.WorkoutDays)
+    {
+        var trigger = true;
+        <div class="panel panel-default">
+            <div class="panel-heading" style="text-align:center; color:#fff; font-size:20px; cursor:pointer; color: rgb(102, 252, 241);" onclick="collapseTable(this, event);">
+                @workout.Workout.Name <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
+                <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;" onclick="sendWeights(this);"></span>
+                <p style="position:absolute; visibility:hidden" class="hiddenWorkoutId"> @workout.Workout.Id </p>
+            </div>
+            <div class="panel-body table-responsive">
+                <table class="trainingTable table table-condensed ">
+                    <thead>
+                        <tr>
+                            <th> Exercise </th>
+                            <th> Reps range </th>
+                            <th> Rest </th>
+                            <th> Weight</th>
+                            <th> Intensity </th>
+                            <th> Actual Reps </th>
+                            <th> Actual Weight </th>
+                        </tr>
+                    </thead>
+
+                    @for (int i = 0; i < workout.Exercises.Count; i++)
+                    {
+                        <tbody>
+                            <tr>
+                                @if (trigger)
+                                {
+                                    <td style="font-size:22px; padding-left: 20px; color: rgb(102, 252, 241); border-right:1px #fff"> @workout.Exercises[i].Name</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+
+
+                                @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
+                                {
+
+                                    trigger = true;
+                                }
+                                else
+                                {
+                                    trigger = false;
+                                }
+
+
+                                <td style="text-align:center; vertical-align: middle;">
+
+                                    @if (workout.Exercises[i].ExpectedRepsFst == workout.Exercises[i].ExpectedRepsSnd)
+                                    {
+                                        @workout.Exercises[i].ExpectedRepsFst
+                                    }
+                                    else
+                                    {
+                                        @workout.Exercises[i].ExpectedRepsFst @:-  @workout.Exercises[i].ExpectedRepsSnd
+                                    }
+
+                                </td>
+                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].RestTime.ToString()</td>
+                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].ExpectedWeight </td>
+                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].Intensity</td>
+
+                                <td style="text-align:center">
+                                    @if (workout.Exercises[i].ActualReps == null)
+                                    {
+                                        @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                 RepsList, "1", new { @class = "form-control", dir = "rtl" })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                 RepsList, workout.Exercises[i].ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
+
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (workout.Exercises[i].ActualWeight == null)
+                                    {
+                                        <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-control" placeholder=" @workout.Exercises[i].ActualWeight.ToString() kg" style=" text-align: right;" />
+                                    }
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+
+}
+
+@section scripts{
+    <script src="@Url.Content("~/Scripts/scripts/timer.js")"></script>
+    <script>
+        $(document).ready(function () {
+            // Workouts list hover efect    
+            $(".panelBody").hover(function () {
+                $(this).stop().animate({
+                    scrollTop: $(this)[0].scrollHeight
+                }, 800);
+            }, function () {
+
+                $(this).stop().animate({
+                    scrollTop: 0
+                }, 400);
+
+            });
+
+            // Dropdown menu
+            $(".dropdown-content").click(function (e) {
+                e.stopPropagation();
+            })
+            $(".dropdown").click(() => {
+                $(".dropdown-content").css("display", "block");
+            });
+            $(".dropdown").hover(() => {
+                $(".dropdown-content").css("display", "block");
+            }, () => {
+                $(".dropdown-content").css("display", "none");
+            });
+
+
+            // Highlight selected element from workouts list
+            $(".panelBody").click(function () {
+                $(".panelBody").removeClass("highLight");
+                $(this).addClass("highLight");
+            });
+
+            // Pagination buttons
+            $(".panel-body li").first().attr("id", "first");
+            $(".panel-body li").last().attr("id", "last");
+            // Stops Workouts list collapse feature when clicking on time icon or menu icon
+            $("#panelTraining > .panel-heading").click(function (e) {
+                if (e.target.className.includes("glyphicon-time")) {
+                    e.stopPropagation();
+                    $('#myModal').modal('show');
+                    return;
+                }
+                else if (e.target.className.includes("glyphicon-option-vertical") || e.target.id == "workoutTitle" || e.target.parentNode.id == "workoutTitle") {
+                    e.stopPropagation();
+                    return;
+                }
+
+                $("#scrollSpans").toggle();
+            });
+
+            // Draggable horizontal scroll - panel
+            const slider = document.querySelector('.panel-body');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 1;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+
+            // Visuals for table actual weight input
+            $(".trainingTable > tbody > tr > td > input").click(function () {
+                $(this).css({ 'background-color': '#fff', 'color': '#000' });
+            });
+
+            $(".trainingTable > tbody > tr > td > input").blur(function () {
+                $(this).css({ 'background-color': 'transparent', 'color': '#fff' });
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+
+            // Load goal bar for each workout
+            $('.programBarGoal').each(function () {
+                let value = $(this).eq(0).attr("data-val");
+                let css = "";
+
+                switch (value) {
+                    case "Strength":
+                        css = {
+                            background: "linear-gradient(to left, rgba(195,32,26,0) 0%,#66fcf1 25%,#66fcf1 75%,#66fcf1 100%",
+                            position: "absolute",
+                            margin: "0",
+                            left: "0",
+                            width: "50%"
+                        };
+                        break;
+                    case "Powerbuilding":
+                        css = {
+                            background: "linear-gradient( to right, rgba(195,32,26,0) 0%, #66fcf1 30%,#66fcf1 75%, rgba(195,32,26,0) 100%)",
+                            position: "relative",
+                            margin: "0 auto",
+                            width: "45%"
+                        };
+                        break;
+                    case "Hypertrophy":
+                        css = {
+                            background: "linear-gradient(to right, rgba(195,32,26,0) 0%,#66fcf1 25%,#66fcf1 75%,#66fcf1 100%",
+                            position: "absolute",
+                            margin: "0",
+                            right: "0",
+                            width: "50%"
+                        };
+                        break;
+                }
+                $(this).eq(0).css(css);
+
+            });
+
+            // Load experience bar for each workout
+            $('.programBarExperience').each(function () {
+
+                let value = $(this).eq(0).attr("data-val");
+                let css = "";
+
+                switch (value) {
+                    case "Beginner":
+                        css = {
+                            background: "linear-gradient(to left, rgba(195,32,26,0) 0%,#66fcf1 25%,#66fcf1 75%,#66fcf1 100%",
+                            position: "absolute",
+                            margin: "0",
+                            left: "0",
+                            width: "50%"
+                        };
+                        break;
+                    case "Intermediate":
+                        css = {
+                            background: "linear-gradient( to right, rgba(195,32,26,0) 0%, #66fcf1 30%,#66fcf1 75%, rgba(195,32,26,0) 100%)",
+                            position: "relative",
+                            margin: "0 auto",
+                            width: "45%"
+                        };
+                        break;
+                    case "Advanced":
+                        css = {
+                            background: "linear-gradient(to right, rgba(195,32,26,0) 0%,#66fcf1 25%,#66fcf1 75%,#66fcf1 100%",
+                            position: "absolute",
+                            margin: "0",
+                            right: "0",
+                            width: "50%"
+                        };
+                        break;
+                }
+                $(this).eq(0).css(css);
+
+            });
+
+            // Select one specific workout from workouts list
+            $(".panelBody").dblclick(function () {
+                var data = {
+                    activeId: activeId = $(this).find(".hiddenId").val()
+                };
+
+                $.ajax({
+                    url: "/TrainingSplit/Training",
+                    type: "POST",
+                    dataType: 'json',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: data,
+                    success: function (response) {
+                        window.location.href = response.redirectToUrl;
+                    }
+
+                });
+            });
+
+            // Create input field when selecting Rename from drop down
+            $(".dropdown-content > li:nth-child(2)").click(function () {
+                let placeholder = $("#workoutTitle").html();
+
+                let input = document.createElement("input");
+                $(input).css({ "background-color" : "transparent", "border" : "1px solid #fff ", "border-radius" : "4px"} )
+                $(input).attr("placeholder", placeholder )
+                $(input).attr("onchange", "rename(this);" )
+                $("#workoutTitle").html(input);
+            });
+
+        });
+        // Sends rename value to the controller
+        function rename(input) {
+            var data = {
+                name: $(input).val()
+            };
+
+            $.ajax({
+                url: "/TrainingSplit/Rename",
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: data,
+                success: function (response) {
+                    window.location.href = response.redirectToUrl;
+                }
+
+            });
+        }
+
+        // Collapse feature for each individual workout
+        function collapseTable(panelHeading, e) {
+            // Stops Workouts collapse feature when clicking on check icon
+            if (e.target.className.includes("glyphicon-ok-circle")) {
+                e.stopPropagation();
+                return;
+            }
+
+            let toggler = $(panelHeading).next().eq(0);
+            let title = $(panelHeading).clone()    //clone the element
+                .children() //select all the children
+                .remove()   //remove all the children
+                .end()  //again go back to selected element
+                .text();
+
+            toggler.slideToggle(300, function () {
+
+                if ($(toggler).is(":visible")) {
+                    $(panelHeading).html(title + ' <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>  <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;" onclick="sendWeights(this);" ></span>');
+                }
+                else {
+                    $(panelHeading).html(title + ' <span class="glyphicon glyphicon-menu-up" style="color:#66fcf1"> </span>  <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;"  onclick="sendWeights(this);" ></span>');
+                }
+            });
+        };
+
+        // Sends weight data to database
+        function sendWeights(icon) {
+            let ok = true;
+            let hiddenWorkoutId = $(icon).parent().eq(0).find(".hiddenWorkoutId").text();
+            let actualWeight = [];
+            let actualReps = [];
+            $(icon).parent().eq(0).next().eq(0).find('input').each(function () {
+                if (!this.value || isNaN(this.value) || this.value < 0) {
+                    $(this).parent().eq(0).removeClass('has-success has-error').addClass('has-error');
+                    ok = false;
+                } else {
+                    $(this).parent().eq(0).removeClass('has-success has-error');
+                    actualWeight.push(this.value);
+
+                    let select = $(this).parent().eq(0).parent().eq(0).find('select')[0];
+                    let value = select.options[select.selectedIndex].text;
+                    actualReps.push(value);
+                }
+            });
+
+            if (ok) {
+                let valdata = {
+                    WorkoutId: hiddenWorkoutId,
+                    ActualWeight: actualWeight,
+                    ActualReps: actualReps
+                };
+
+                $.ajax({
+                    url: "/TrainingSplit/Training",
+                    type: "POST",
+                    dataType: 'json',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: valdata,
+                    success: function (response) {
+                        window.location.href = response.redirectToUrl;
+                    }
+
+                });
+            }
+
+        }
+
+    </script>
+}
+
+@section Quote{
+    Pressure is privilege
+}

@@ -21,11 +21,10 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Training", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Training", "Training", "TrainingSplit")</li>
                     <li>@Html.ActionLink("Timer", "Timer", "Home")</li>
                     <li>@Html.ActionLink("Progress", "Progress", "Weight")</li>
-                    <li>@Html.ActionLink("Calendar", "About", "Home")</li>
-
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         if (User.IsInRole("Admin") || User.IsInRole("Employee"))
@@ -33,6 +32,8 @@
                             <li>@Html.ActionLink("Members", "Members", "Account")</li>
                         }
                     }
+
+
                     <hr />
                 </ul>
                 @Html.Partial("_LoginPartial")
@@ -41,7 +42,7 @@
     </div>
     <div class="container body-content" >
         @RenderBody()
-        <div style="margin-top : 25px;">
+        <div style="margin-top : 25px;" class="col-md-12">
             <hr />
             <footer class="row ">
                 <div class="column col-xs-6" style="padding-left : 0;">

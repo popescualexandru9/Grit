@@ -6,6 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using Grit.Models;
+using System.Configuration;
 
 namespace Grit
 {
@@ -54,10 +55,10 @@ namespace Grit
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
-
+            app.UseFacebookAuthentication(
+               appId: ConfigurationManager.AppSettings["FacebookId"],
+               appSecret: ConfigurationManager.AppSettings["FacebookSecret"]);
+            
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{
             //    ClientId = "",

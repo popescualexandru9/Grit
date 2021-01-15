@@ -1,0 +1,839 @@
+﻿@model  Grit.ViewModels.AddSplitFillViewModel
+@{
+    string[] equipment = { "Full Gym", "BodyWeight", "Pull up bar", "Dumbbells", "Bands", "Home gym ( 2-3 of the above) " };
+    string[] frequency = { "1 day per week", "2 days per week", "3 days per week", "4 days per week", "5 days per week", "6 days per week", "7 days per week", };
+    string[] goal = { "Strength", "Powerbuilding", "Hypertrophy" };
+    string[] experience = { "Beginner ( <1 year)", "Intermediate ( 1-2 years)", "Advanced (2-3+ years)" };
+    string[] duration = { "15 min", "30 min", "45 min", "1h", "1h 15 min", "1h 30 min", "1h 45 min", "2h", "2h 15 min", "2h 30 min", "2h 45 min", "3h" };
+
+    SelectList EquipmentList = new SelectList(equipment);
+    SelectList FrequencyList = new SelectList(frequency);
+    SelectList GoalList = new SelectList(goal);
+    SelectList ExperienceList = new SelectList(experience);
+    SelectList DurationList = new SelectList(duration);
+
+    ViewBag.Title = "Add Split";
+}
+
+<h2>New workout routine</h2>
+<h4>
+    Spread your training frequency throughout multiple workouts to maximize performance and hypertrophy.
+</h4>
+<hr />
+
+@if (Model == null)
+{
+    <form class="form-horizontal" role="form" id="trainingForm">
+        <div class=" col-md-8">
+            <div class="form-group ">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Name:</label>
+                <div class="col-md-10">
+                    <input class="form-control" onclick="changeBackgroundOnClick(this);" name="Name" autocomplete="off" id="trainingName"
+                           onblur="changeBackgroundOnBlur(this);"
+                           onfocusout="changeBackgroundOnFocusOut(this);">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Equipment:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Equipment", EquipmentList, new
+                   {
+                       @class = "form-control",
+                       onclick = "changeBackgroundOnClick(this);",
+                       onblur = "changeBackgroundOnBlur(this);",
+                       onfocusout = "changeBackgroundOnFocusOut(this);",
+                       id = "trainingEquipment"
+                   })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Frequency:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Frequency", FrequencyList, new
+                {
+                   @class = "form-control",
+                   onclick = "changeBackgroundOnClick(this);",
+                   onblur = "changeBackgroundOnBlur(this);",
+                   onfocusout = "changeBackgroundOnFocusOut(this);",
+                   id = "trainingFrequency"
+                })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Goal:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Goal", GoalList, new
+                   {
+                       @class = "form-control",
+                       onclick = "changeBackgroundOnClick(this);",
+                       onblur = "changeBackgroundOnBlur(this);",
+                       onfocusout = "changeBackgroundOnFocusOut(this);",
+                       id = "trainingGoal"
+                   })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Experience:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Experience", ExperienceList, new
+                   {
+                       @class = "form-control",
+                       onclick = "changeBackgroundOnClick(this);",
+                       onblur = "changeBackgroundOnBlur(this);",
+                       onfocusout = "changeBackgroundOnFocusOut(this);",
+                       id = "trainingExperience"
+                   })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> ~Duration:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Duration", DurationList, new
+                    {
+                        @class = "form-control",
+                        onclick = "changeBackgroundOnClick(this);",
+                        onblur = "changeBackgroundOnBlur(this);",
+                        onfocusout = "changeBackgroundOnFocusOut(this);",
+                         id = "trainingDuration"
+                    })
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Description:</label>
+                <div class="col-md-10">
+                    <textarea class="form-control" onclick="changeBackgroundOnClick(this);" style="min-height:70px; white-space:pre-line" placeholder="*This field is optional*" id="trainingDescription"
+                              onblur="changeBackgroundOnBlur(this);"
+                              onfocusout="changeBackgroundOnFocusOut(this);"></textarea>
+                </div>
+
+            </div>
+        </div>
+        <br />
+        <br />
+
+
+        <div id="workoutBody" style="margin-top:90px;" class="col-md-12">
+
+        </div>
+
+        <div class="addExerciseBtns col-md-12" style="margin-top: 70px;">
+            <a id="addWorkout" style="text-decoration:none; cursor:pointer;" class="col-sm-12">ADD WORKOUT</a>
+            <br />
+            <br />
+            <button class="btn btn-primary" id="submitButton">Submit</button>
+        </div>
+
+
+        <div class="modal fade" id="addExerciseModel" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <label>ADD EXERCISE</label>
+                            <select class="form-control" style=" width: 50%; margin: 0 auto; text-align:center;" id="modalSelectFst">
+                            </select>
+                            <br />
+                            <select class="form-control" style=" width: 50%; margin: 0 auto; text-align:center;" id="modalSelectSnd">
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-center">
+                            <button class="btn disabledBtn" stytle="width: 35%;" disabled type="button" onclick="addTable();" id="submitModal"> Submit </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <form class="form-horizontal" role="form" id="trainingForm">
+        <div class=" col-md-8">
+            <div class="form-group ">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Name:</label>
+                <div class="col-md-10">
+                    <input class="form-control" onclick="changeBackgroundOnClick(this);" name="Name" autocomplete="off" id="trainingName" placeholder= @Model.Split.Name
+                           onblur="changeBackgroundOnBlur(this);"
+                           onfocusout="changeBackgroundOnFocusOut(this);">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Equipment:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Equipment", EquipmentList, Model.Split.Equipment, new
+                   {
+                       @class = "form-control",
+                       onclick = "changeBackgroundOnClick(this);",
+                       onblur = "changeBackgroundOnBlur(this);",
+                       onfocusout = "changeBackgroundOnFocusOut(this);",
+                       id = "trainingEquipment"
+                   })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Frequency:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Frequency", FrequencyList, Model.Split.Frequency + " days per week", new
+                {
+                   @class = "form-control",
+                   onclick = "changeBackgroundOnClick(this);",
+                   onblur = "changeBackgroundOnBlur(this);",
+                   onfocusout = "changeBackgroundOnFocusOut(this);",
+                   id = "trainingFrequency"
+                })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Goal:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Goal", GoalList, Model.Split.Goal, new
+               {
+                   @class = "form-control",
+                   onclick = "changeBackgroundOnClick(this);",
+                   onblur = "changeBackgroundOnBlur(this);",
+                   onfocusout = "changeBackgroundOnFocusOut(this);",
+                   id = "trainingGoal"
+               })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Experience:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Experience", ExperienceList, Model.Split.Experience, new
+               {
+                   @class = "form-control",
+                   onclick = "changeBackgroundOnClick(this);",
+                   onblur = "changeBackgroundOnBlur(this);",
+                   onfocusout = "changeBackgroundOnFocusOut(this);",
+                   id = "trainingExperience"
+               })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> ~Duration:</label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Duration", DurationList, Model.Split.Length + " min", new
+               {
+                   @class = "form-control",
+                   onclick = "changeBackgroundOnClick(this);",
+                   onblur = "changeBackgroundOnBlur(this);",
+                   onfocusout = "changeBackgroundOnFocusOut(this);",
+                   id = "trainingDuration"
+               })
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" style="font-size :16px; color:#fff"> Description:</label>
+                <div class="col-md-10">
+                    <textarea class="form-control" onclick="changeBackgroundOnClick(this);" style="min-height:70px; white-space:pre-line" placeholder="@Model.Split.Description" id="trainingDescription"
+                              onblur="changeBackgroundOnBlur(this);"
+                              onfocusout="changeBackgroundOnFocusOut(this);"></textarea>
+                </div>
+
+            </div>
+        </div>
+        <br />
+        <br />
+
+
+        <div id="workoutBody" style="margin-top:90px;" class="col-md-12">
+           @foreach(var workoutDay in Model.WorkoutDays)
+             {
+             <div class="workoutDiv" style="margin-bottom: 35px">
+                 <div>
+                     <div class="form-group" style="display: inline-block; width: 220px;">
+                         <input class="form-control WorkoutName" placeholder=@workoutDay.Workout.Name autocomplete="off" name="name1" style="display: inline-block; width: 220px;"
+                                onfocusout="$(this).css({ 'background-color': 'transparent', 'color': '#fff', 'font-size': '28px' });"
+                                onclick="changeBackgroundOnClick(this)"
+                                onblur="$(this).css({ 'background-color': 'transparent', 'color': '#fff', 'border': 'none' });">
+                     </div>
+                     <h4 onclick="removeWorkout(this);"
+                         style="margin: 10px 0px 0px; float: right; font-weight: 600; color: rgb(255, 0, 0); cursor: pointer; display: inline-block;">
+                         Remove
+                     </h4>
+                     <h4 onclick="collapseWorkouts(this);"
+                         style="margin: 9px 30px 0px 0px; float: right; font-weight: 600; color: rgb(102, 252, 241); cursor: pointer; display: inline-block;">
+                         Collapse <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
+                     </h4>
+                 </div>
+              
+                <div style="width: 94%; margin: 0px auto;">
+                    <section>
+                        @for (int i = 0; i < workoutDay.Exercises.Count; i++)
+                        {   
+                            var setCount = 1;
+                            if (i == 0 || workoutDay.Exercises[i].Name != workoutDay.Exercises[i - 1].Name)
+                            {
+                                <fieldset class="fieldsets">
+                                    <legend> @workoutDay.Exercises[i].Name</legend>
+                                    <h3 id="hidden" style="visibility: hidden; position: absolute;">@workoutDay.Exercises[i].MuscleGroup</h3>
+                                    <h3 onclick="removeTable(this);" style="position: relative; margin-left: -21px; margin-top: -33px; color: rgb(255, 0, 0); cursor: pointer; width: 20px;">✕</h3>
+
+                                    <table class="trainingTable table table-condensed">
+                                        <thead>
+                                         <tr> 
+                                            <th style="padding-left: 10px;"> Set </th>
+                                            <th colspan="2"> Reps range </th>
+                                            <th> Rest </th><th> Weight</th>
+                                            <th> Intensity </th>
+                                            <th style="width: 60px;"> 
+                                             <button class="glyphicon glyphicon-plus glyphiconCenter tableBtns" data-toggle="tooltip" data-placement="top" title="Add set" type="button" style="color:#66fcf1" onclick="addRow(this);">  </button></th>
+                                         </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="font-size: 24px; padding-left: 25px; color: rgb(102, 252, 241);"> @setCount</td>
+
+                                                <td><select class="form-control " data-val="true"> <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option></select></td>
+                                                <td> <select class="form-control " data-val="true"> <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option></select></td>
+                                                <td> <select class="form-control " data-val="true"> <option value="0.15">0.15</option><option value="0.30">0.30</option><option value="0.45">0.45</option><option value="1.00">1.00</option><option value="1.15">1.15</option><option value="1.30">1.30</option><option value="1.45">1.45</option><option value="2.00">2.00</option><option value="2.15">2.15</option><option value="2.30">2.30</option><option value="2.45">2.45</option><option value="3.00">3.00</option><option value="3.15">3.15</option><option value="3.30">3.30</option><option value="3.45">3.45</option><option value="4.00">4.00</option><option value="4.15">4.15</option><option value="4.30">4.30</option><option value="4.45">4.45</option><option value="5.00">5.00</option></select></td>
+                                                <td> <select class="form-control " data-val="true"> <option value="Light">Light</option><option value="Moderate">Moderate</option><option value="Heavy">Heavy</option><option value="Heavier">Heavier</option><option value="Same">Same</option><option value="Drop Set">Drop Set</option></select></td>
+                                                <td> <select class="form-control " data-val="true"> <option value="Warm up">Warm up</option><option value="Moderate">Moderate</option><option value="Hard">Hard</option><option value="Harder">Harder</option><option value="Failure">Failure</option></select></td>
+                                                <td> <button class="glyphicon glyphicon-minus glyphiconCenter tableBtns" data-toggle="tooltip" data-placement="right" title="Delete set" style="color: red; padding-left : 35px;" onclick="removeRow(this);" type="button"></button> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                                 setCount = 1;
+                            }
+                            else if (workoutDay.Exercises[i].Name == workoutDay.Exercises[i - 1].Name)
+                            {
+                                setCount += 1;
+                            }
+
+                        }
+                    </section>
+                </div>
+
+                <hr style="margin-top: 5px;">
+             </div>
+             }
+        </div>
+
+        <div class="addExerciseBtns col-md-12" style="margin-top: 70px;">
+            <a id="addWorkout" style="text-decoration:none; cursor:pointer;" class="col-sm-12">ADD WORKOUT</a>
+            <br />
+            <br />
+            <button class="btn btn-primary" id="submitButton">Submit</button>
+        </div>
+
+
+        <div class="modal fade" id="addExerciseModel" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <label>ADD EXERCISE</label>
+                            <select class="form-control" style=" width: 50%; margin: 0 auto; text-align:center;" id="modalSelectFst">
+                            </select>
+                            <br />
+                            <select class="form-control" style=" width: 50%; margin: 0 auto; text-align:center;" id="modalSelectSnd">
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <div class="text-center">
+                            <button class="btn disabledBtn" stytle="width: 35%;" disabled type="button" onclick="addTable();" id="submitModal"> Submit </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+
+
+@section scripts{
+    <script>
+        let i = 1;
+        var triggerElement;
+        const intensity = ["Warm up", "Moderate", "Hard", "Harder", "Failure"];
+        const restTime = ["0.15", "0.30", "0.45", "1.00", "1.15", "1.30", "1.45", "2.00", "2.15", "2.30", "2.45", "3.00", "3.15", "3.30", "3.45", "4.00", "4.15", "4.30", "4.45", "5.00"];
+        const weight = ["Light", "Moderate", "Heavy", "Heavier", "Same", "Drop Set"];
+        const repsFst = [...Array(31).keys()].slice(1, 31);
+        const repsSnd = [...Array(31).keys()].slice(1, 31);
+
+        const muscleGroup = {
+            Chest: [],
+            Back: [],
+            Arms: [],
+            Shoulders: [],
+            Legs: [],
+            Abs: [],
+            Calves: []
+        };
+        const exerciseArray = [];
+        callExerciseApi();
+
+        // Change drop down options for exercises
+        $("#modalSelectFst").change(function () {
+            let val = $("#modalSelectFst").val().toString();
+            $("#modalSelectSnd").html("");
+
+            $.each(muscleGroup, function (key, values) {
+                if (key === val) {
+                    values.forEach((x) => {
+                        let opt = x.toString();
+                        let el = document.createElement("option");
+                        el.textContent = opt;
+                        el.value = opt;
+                        $("#modalSelectSnd").append(el);
+                    });
+                }
+            });
+        });
+
+        function callExerciseApi() {
+            $.ajax({
+                url: "https://localhost:44387/exerciseapi"
+            }).then(function (data) {
+
+                data.forEach((x) => {
+                    let obj = {};
+                    obj.Name = x.Name;
+                    obj.Description = x.Description;
+                    obj.Muscle = x.MuscleIds;
+                    obj.Equipment = x.EquipmentIds;
+                    obj.Category = x.CategoryId;
+
+                    exerciseArray.push(obj);
+                });
+
+                populateInitial();
+
+                $("#submitModal").removeClass("disabledBtn");
+                $("#submitModal").addClass("btn-primary");
+                $("#submitModal").attr("disabled", false);
+                $("#addExerciseModel").css("cursor", "default");
+
+            });
+        }
+
+        function populateInitial() {
+            // Populate muscle group exercises
+            exerciseArray.forEach((exercise) => {
+                switch (exercise.Category) {
+                    case 11:
+                        muscleGroup.Chest.push(exercise.Name);
+                        break;
+                    case 12:
+                        muscleGroup.Back.push(exercise.Name);
+                        break;
+                    case 8:
+                        muscleGroup.Arms.push(exercise.Name);
+                        break;
+                    case 13:
+                        muscleGroup.Shoulders.push(exercise.Name);
+                        break;
+                    case 9:
+                        muscleGroup.Legs.push(exercise.Name);
+                        break;
+                    case 10:
+                        muscleGroup.Abs.push(exercise.Name);
+                        break;
+                    case 14:
+                        muscleGroup.Calves.push(exercise.Name);
+                        break;
+                }
+            });
+
+            // Initialize muscle group drop down options
+            $.each(muscleGroup, function (key, values) {
+                let opt = key.toString();
+                let el = document.createElement("option");
+                el.textContent = opt;
+                el.value = opt;
+                $("#modalSelectFst").append(el);
+
+                if (key === "Chest") {
+                    values.forEach((x) => {
+                        let opt = x.toString();
+                        let el = document.createElement("option");
+                        el.textContent = opt;
+                        el.value = opt;
+                        $("#modalSelectSnd").append(el);
+                    });
+                }
+            });
+        }
+
+        function removeRow(button) {
+            //Determine the reference of the Row using the Button.
+            let row = $(button).closest("tr");
+            //Get the reference of the Table.
+            let table = $(button).closest("table")[0];
+            let tr = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            if (tr.length < 2) {
+                return;
+            }
+
+            //Delete the Table row using it's Index.
+            table.deleteRow(row[0].rowIndex);
+            $.each(tr, function () {
+                $(this).find('td').first().html('<td scope="col" style="font-size:24px; color:#66fcf1">' + this.rowIndex + '</td>');
+            })
+
+        };
+
+        function addRow(button) {
+
+            //Get the reference of the Table's TBODY element.
+            let tBody = $(button).closest("table")[0].getElementsByTagName('tbody')[0];;
+
+            //Add Row.
+            let row = tBody.insertRow(-1);
+
+            //Add cells.
+            let cell = $(row.insertCell(-1));
+            let cntr = tBody.getElementsByTagName('tr').length;
+            cell.css({ "font-size": "24px", "padding-left": "25px", "color": "#66fcf1" })
+            cell.html(cntr);
+
+            cell = insertCell($(row.insertCell(-1)), '<select class="form-control " data-val="true"  > </select >', repsFst);
+
+            cell = insertCell($(row.insertCell(-1)), ' <select class="form-control " data-val="true" > </select >', repsSnd);
+
+            cell = insertCell($(row.insertCell(-1)), ' <select class="form-control " data-val="true" > </select >', restTime);
+
+            cell = insertCell($(row.insertCell(-1)), ' <select class="form-control " data-val="true" > </select >', weight);
+
+            cel = insertCell($(row.insertCell(-1)), ' <select class="form-control " data-val="true" > </select >', intensity);
+
+            //Add Button cell.
+            cell = $(row.insertCell(-1));
+            cell.html(' <button class="glyphicon glyphicon-minus glyphiconCenter tableBtns" data-toggle="tooltip" data-placement="right"' +
+                'title = "Delete set" style="color: red; padding-left : 35px;" onclick="removeRow(this);" type="button" /> </button >')
+
+        };
+
+        function insertCell(cell, html, options) {
+            cell.html(html);
+            for (let i = 0; i < options.length; i++) {
+                let opt = options[i];
+                let el = document.createElement("option");
+                el.textContent = opt;
+                el.value = opt;
+                let select = cell.find('select');
+                select.append(el);
+            };
+
+            return cell;
+        }
+
+        function addTable() {
+            // Create table
+            let table = document.createElement('table');
+            table.classList.add("trainingTable", "table", "table-condensed");
+
+            // Create table head and first row
+            let tableHead = document.createElement('thead');
+            let tableTr = document.createElement('tr');
+
+            // Create and append THead cells to TR
+            let setTh = document.createElement("th");
+            $(setTh).css("padding-left", "10px");
+            $(setTh).html(' Set ');
+            tableTr.append(setTh);
+
+            let repsTh = document.createElement("th");
+            $(repsTh).attr("colspan", 2);
+            $(repsTh).html(' Reps range ');
+            tableTr.append(repsTh);
+
+            let restTh = document.createElement("th");
+            $(restTh).html(' Rest ');
+            tableTr.append(restTh);
+
+            let weightTh = document.createElement("th");
+            $(weightTh).html(' Weight');
+            tableTr.append(weightTh);
+
+            let intensityTh = document.createElement("th");
+            $(intensityTh).html(' Intensity ');
+            tableTr.append(intensityTh);
+
+            let buttonTh = document.createElement("th");
+            $(buttonTh).css("width", "60px");
+            $(buttonTh).html(' <button class="glyphicon glyphicon-plus glyphiconCenter tableBtns" data-toggle="tooltip" data-placement="top" title="Add set" type="button" style="color:#66fcf1" onclick="addRow(this);">  </button >');
+            tableTr.append(buttonTh);
+
+            // Append TR to THead and THead to table
+            tableHead.append(tableTr);
+            table.append(tableHead);
+
+            // Create and append TBody
+            let tableBody = document.createElement('tbody');
+            table.append(tableBody);
+
+            // Create fieldset, legend and remove button. Append legend and button to fieldset
+            let fieldSet = document.createElement('fieldset');
+            fieldSet.classList.add("fieldsets")
+
+            let legend = document.createElement('legend');
+            $(legend).html($("#modalSelectSnd").val());
+            fieldSet.append(legend);
+
+            let hidden = document.createElement('h3');
+            $(hidden).html($("#modalSelectFst").val());
+            $(hidden).attr("id", "hidden");
+            $(hidden).css({ "visibility": "hidden", "position": "absolute" });
+            fieldSet.append(hidden);
+
+            let removeX = document.createElement('h3');
+            $(removeX).html("&#10005");
+            $(removeX).css({ "position": "relative", "margin-left": "-21px", "margin-top": "-33px", "color": "red", "cursor": "pointer", "width": "20px" });
+            $(removeX).attr("onclick", "removeTable(this);");
+            fieldSet.append(removeX);
+
+            // Append table to fieldset
+            fieldSet.append(table);
+            let workoutDiv = triggerElement.parent().eq(0).prev().eq(0);
+
+            // Append fieldset to div
+            workoutDiv.append(fieldSet);
+            // Create first row of TBody
+            $(buttonTh).find('button').click();
+        }
+
+        function removeTable(button) {
+
+            $(button).next().eq(0).remove();
+            let prev = $(button).prev().eq(0);
+            let legend = $(prev).prev().eq(0);
+            let fieldset = $(legend).parent().eq(0);
+            $(prev).remove();
+            $(legend).remove();
+            $(fieldset).remove();
+            $(button).remove();
+        };
+
+        $("#addWorkout").click(() => {
+
+            let divParent = document.createElement('div');
+            divParent.classList.add("workoutDiv");
+            $(divParent).css("margin-bottom", "35px");
+
+            let divHead = document.createElement('div');
+
+            let div = document.createElement('div');
+            div.classList.add("form-group");
+            $(div).css({ "display": "inline-block", "width": "220px" });
+
+            let workoutName = document.createElement('input');
+            workoutName.classList.add("form-control", "WorkoutName");
+            $(workoutName).css({ "display": "inline-block", "width": "220px" });
+            $(workoutName).attr("placeholder", "e.g. Push day/ Arms day ");
+            $(workoutName).attr("onfocusout", "$(this).css({ 'background-color': 'transparent', 'color': '#fff', 'font-size': '28px' });");
+            $(workoutName).attr("onclick", "changeBackgroundOnClick(this)");
+            $(workoutName).attr("onblur", "$(this).css({ 'background-color': 'transparent', 'color': '#fff', 'border': 'none' });");
+            $(workoutName).attr("autocomplete", "off");
+            $(workoutName).attr("name", "name" + i);
+            i += 1;
+            div.append(workoutName);
+
+            let workoutCollapse = document.createElement('h4');
+            $(workoutCollapse).css({ "margin": "9px 30px 0 0", "float": "right", "font-weight": 600, "color": "#66fcf1", "cursor": "pointer", "display": "inline-block" });
+            $(workoutCollapse).attr("onclick", "collapseWorkouts(this);");
+            $(workoutCollapse).html('Collapse <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>');
+
+            let workoutRemove = document.createElement('h4');
+            $(workoutRemove).css({ "margin": "10px 0 0", "float": "right", "font-weight": 600, "color": "red", "cursor": "pointer", "display": "inline-block" });
+            $(workoutRemove).attr("onclick", "removeWorkout(this);");
+            $(workoutRemove).html("Remove");
+
+            divHead.append(div);
+            divHead.append(workoutRemove);
+            divHead.append(workoutCollapse);
+
+            let divBody = document.createElement('div');
+            $(divBody).css({ "width": "94%", "margin": "0 auto" });
+
+            let tableSection = document.createElement('section');
+            let divAddExercise = document.createElement('div');
+            divAddExercise.classList.add("addExerciseBtns");
+
+            let btnAddExercise = document.createElement('a');
+            $(btnAddExercise).css({ "text-decoration": "none", "cursor": "pointer" });
+            $(btnAddExercise).attr("data-toggle", "modal");
+            $(btnAddExercise).attr("data-target", "#addExerciseModel");
+            $(btnAddExercise).html("ADD EXERCISE");
+
+            let hr = document.createElement('hr');
+            $(hr).css("margin-top", "5px");
+
+            divAddExercise.append(btnAddExercise);
+            divBody.append(tableSection);
+            divBody.append(divAddExercise);
+
+            divParent.append(divHead);
+            divParent.append(divBody);
+            divParent.append(hr);
+
+            $("#workoutBody").append(divParent);
+        });
+
+        function removeWorkout(button) {
+            $(button).parent().eq(0).parent().eq(0).remove();
+        }
+
+        function changeBackgroundOnFocusOut(button) {
+            $(button).css({ "background-color": "transparent", "color": "#fff" })
+        }
+        function changeBackgroundOnClick(button) {
+            $(button).css({ 'background-color': '#fff', 'color': '#555' });
+        }
+        function changeBackgroundOnBlur(button) {
+            $(button).css({ "background-color": "transparent", "color": "#fff" })
+        }
+
+        function collapseWorkouts(button) {
+            //open up the content needed - toggle the slide - if visible, slide up, if not slidedown.
+            let toggler = $(button).parent().eq(0).next().eq(0);
+            toggler.slideToggle(500, function () {
+
+                if ($(toggler).is(":visible")) {
+                    $(button).html('Collapse <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>');
+                }
+                else {
+                    $(button).html('Collapse <span class="glyphicon glyphicon-menu-up" style="color:#66fcf1"> </span>');
+                }
+            });
+        };
+
+        // Get "ADD EXERCISE" button which triggered the modal so we can add an exercise accordingly to the DOM since we add by class
+        $('#addExerciseModel').on('shown.bs.modal', function (event) {
+            triggerElement = $(event.relatedTarget).eq(0); // Button that triggered the modal
+        });
+
+        $.validator.addClassRules({
+            WorkoutName: {
+                required: true
+            }
+        });
+
+        $('#submitButton').click(function () {
+
+            if (!$("#workoutBody").find(".workoutDiv").length > 0) {
+                bootbox.alert({
+                    message: " <h4><strong style='color:red'> Error </strong></h4> </br> <p> A workout plan has to have at least one exercise &#x1F605; </p>"
+                });
+                return false;
+            }
+
+            $(".workoutDiv").each(function () {
+                if (!$(this).find("fieldset").length > 0) {
+                    bootbox.alert({
+                        message: " <h4><strong style='color:red'> Error </strong></h4> </br> <p> A workout plan has to have at least one exercise &#x1F605; </p>"
+                    });
+                    return false;
+                }
+            });
+
+            $("#trainingForm").validate({
+                errorClass: 'help-block animation-slideDown', // You can change the animation class for a different entrance animation - check animations page
+                errorElement: 'div',
+                errorPlacement: function (error, e) {
+                    e.parents('.form-group > div').append(error);
+                },
+                highlight: function (e) {
+                    $(e).closest('.form-group').removeClass('has-success has-error').addClass('has-error');
+                    $(e).closest('.help-block').remove();
+                },
+                success: function (e) {
+                    e.closest('.form-group').removeClass('has-success has-error');
+                    e.closest('.help-block').remove();
+                },
+                rules: {
+                    Name: "required",
+                },
+                // Specify validation error messages
+                messages: {
+                    Name: "This field can't be empty",
+                },
+
+                submitHandler: function (form) {
+
+                    let TrainingSplitValues = {
+                        Name: $("#trainingName").val().toString(),
+                        Frequency: getSelectValue($("#trainingFrequency")),
+                        Equipment: getSelectValue($("#trainingEquipment")),
+                        Goal: getSelectValue($("#trainingGoal")),
+                        Experience: getSelectValue($("#trainingExperience")),
+                        Length: ($("#trainingDuration").prop('selectedIndex') + 1) * 15,
+                        Description: $("#trainingDescription").val().toString()
+                    };
+
+                    let Workouts = [];
+
+                    $(".workoutDiv").each(function () {
+                        let sets = []
+
+                        $(this).find(".fieldsets").each(function () {
+                            let name = $(this).find('legend').html().toString();
+                            let muscleGroup = $(this).find('#hidden').html().toString();
+
+
+                            $(this).find("tbody > tr").each(function () {
+
+                                let Set = {
+                                    Name: name,
+                                    ExpectedReps: {
+                                        fst: parseInt(getSelectValue($(this).find('td:nth-child(2) > select'))),
+                                        snd: parseInt(getSelectValue($(this).find('td:nth-child(3) > select')))
+                                    },
+                                    RestTime: parseFloat(getSelectValue($(this).find('td:nth-child(4) > select'))),
+                                    ExpectedWeight: getSelectValue($(this).find('td:nth-child(5) > select')),
+                                    Intensity: getSelectValue($(this).find('td:nth-child(6) > select ')),
+                                    MuscleGroup: muscleGroup
+                                };
+
+                                sets.push(Set);
+                            });
+                        });
+
+                        let workout = {
+                            Name: $(this).find('.WorkoutName').val().toString(),
+                            Sets: sets
+                        };
+
+                        Workouts.push(workout);
+                    });
+
+
+                    let valdata = {
+                        TrainingSplitValues: TrainingSplitValues,
+                        Workouts: Workouts
+                    };
+
+                    $.ajax({
+                        url: "/TrainingSplit/AddSplit",
+                        type: "POST",
+                        dataType: 'json',
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: valdata,
+                        success: function (response) {
+                            window.location.href = response.redirectToUrl;
+                        }
+
+                    });
+                }
+            });
+        });
+
+        function getSelectValue(select) {
+            return select[0].options[select[0].selectedIndex].text.toString();
+        }
+    </script>
+}
+
+@section Quote{
+    Never ring the bell
+}

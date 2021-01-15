@@ -1,5 +1,8 @@
-﻿using Microsoft.Owin;
+﻿using Grit.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Owin;
 using Owin;
+using System.Web.Http;
 
 [assembly: OwinStartupAttribute(typeof(Grit.Startup))]
 namespace Grit

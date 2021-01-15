@@ -3,22 +3,22 @@
     string[] options = { "One Week", "One Month", "Two Months", "Three Months", "Six Months", "One Year", "Two Years", "Five Years" };
     ViewBag.Title = "Progress";
     SelectList list = new SelectList(options);
-    ViewBag.myList = list;
 }
 
 <br />
 @using (Html.BeginForm("Progress", "Weight", FormMethod.Post, new { }))
 {
-    @Html.DropDownList("ProgressList", ViewBag.myList as SelectList, new{  @class = "form-control pull-right",
-                                                                           @style = "margin-right : 26px; direction: rtl;",
-                                                                           @id = "chartChange"})
+    @Html.DropDownList("ProgressList", list as SelectList, new { @class = "form-control pull-right",
+    @style = "margin-right : 26px; direction: rtl;",
+    @id = "chartChange" })
 }
 <br />
 
 <canvas id="line-chart"></canvas>
 
 <div class="row" style="margin-top : 50px; margin-bottom: -20px">
-    <h3 class="pull-left" style="margin : 15px 0 0 15px;">Entries</h3>
+    <h3 class="pull-left" style="margin : 15px 0 0 15px; cursor:pointer" id="dropDownEntryBtn">Entries
+        <span class="glyphicon glyphicon-triangle-bottom pull-right" style="font-size : 20px; top:4px; cursor:pointer">   </span></h3>
     <button type="submit" class="pull-right btn btn-primary" style="margin: 10px 15px 15px 0;" data-toggle="modal" data-target="#addWeightModal">
         Add weight
     </button>
@@ -30,15 +30,16 @@
                  <div class="modal-body" style="margin-left:20px;">
 
                     <div class="form-group row" >
-                        @Html.LabelFor(m => m.TodaysWeight.Date, new { @class = "col-sm-2 control-label", style="padding-top :7px;" })
+                        @Html.LabelFor(m => m.TodaysWeight.Date, new { @class = "col-sm-2 control-label", style = "padding-top :7px;" })
                         @Html.TextBoxFor(m => m.TodaysWeight.Date, "{0:dd MMM yyyy}", new
-                        {
-                            @class = "form-control datepicker col-sm-10",
-                            style = "background-color:transparent; color:#fff",
-                            onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
-                            onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
-                            onchange = "$('#addWeightInputId').val('0.00');"
-                        })
+                   {
+                       @class = "form-control datepicker col-sm-10",
+                       style = "background-color:transparent; color:#fff",
+                       autocomplete = "off",
+                       onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                       onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                       onchange = "$('#addWeightInputId').val('0.00');"
+                   })
                     </div>
                
                     <div class="form-group row">
@@ -58,33 +59,70 @@
 
 <hr />
 
-<p class="text-danger" style="margin-left : 35px; display:none">
-    Weight field should contain between 0 and 2 decimals.
-    <br /> Please respect the format to be able to update.
-</p>
+<div class="row" >
+    <div class="col-md-6" id="dropDownEntries">
+        <p class="text-danger" style="margin-left : 35px; display:none">
+            Weight field should contain between 0 and 2 decimals.
+            <br /> Please respect the format to be able to update.
+        </p>
 
-<div>
-    @{
-        foreach (var day in Model.Weights.Reverse())
-        {
-            using (Html.BeginForm("ChangeWeight", "Weight", new { dateInput = day.Date }, FormMethod.Post,
-                                                            new { @class = "form-horizontal", role = "form", @id = "progressChangeWeightForm" }))
-            {
-                <div class="form-group">
-                    <label class="control-label col-md-2" style="font-size :16px; color:#fff"> @day.Date.ToString("dd MMM yyyy") </label>
-                    @Html.TextBox("weightInput", day.Weigth, new{   @class = "form-control col-md-10",
-                                                                    style = "background-color:transparent; color:#fff",
-                                                                    id = "changeWeightInputId",
-                                                                    onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
-                                                                    onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
-                                                                    onchange = "$(this).parents().submit();" })
-                </div>
-                <br />
+        <div >
+            @{
+                foreach (var day in Model.Weights.Reverse())
+                {
+                    using (Html.BeginForm("ChangeWeight", "Weight", new { dateInput = day.Date }, FormMethod.Post,
+                                                                    new { @class = "form-horizontal", role = "form", @id = "progressChangeWeightForm" }))
+                    {
+                        <div class="form-group">
+                            <label class="control-label col-md-4" style="font-size :16px; color:#fff"> @day.Date.ToString("dd MMM yyyy") </label>
+                            @Html.TextBox("weightInput", day.Weigth, new
+                       {
+                           @class = "form-control col-md-8",
+                           style = "background-color:transparent; color:#fff",
+                           id = "changeWeightInputId",
+                           onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                           onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                           onchange = "$(this).parents().submit();"
+                       })
+                        </div>
+                        <br />
+                    }
+
+                }
             }
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default" id="panelProgress">
+            <div class="panel-heading">
+                <h3 class="panel-title">Statistics</h3>
+            </div>
+            <div class="panel-body" >
+                <dl class="dl-horizontal" style="margin-left :15px;">
 
-        }
-    }
+
+                    <dt data-toggle="tooltip" data-placement="right" title="For most adults, an ideal BMI is in the 18.5 to 24.9 range">BMI :</dt>
+                    <dd data-toggle="tooltip" data-placement="left" title="" id="bmiStats"> </dd>
+
+                    <dt>All-time high :</dt>
+                    <dd>@Model.Weights.Max(x => x.Weigth) kg</dd>
+
+                    <dt>All-time low :</dt>
+                    <dd>@Model.Weights.Min(x => x.Weigth) kg</dd>
+
+                    <dt>Measurments :</dt>
+                    <dd>@Model.Weights.Count()</dd>
+
+                    <dt>Average last 7 entries :</dt>
+                    <dd id="avgStats"></dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 @section scripts{
     <script>
@@ -263,7 +301,7 @@
             changeYear: true,
             maxDate: 0,
             firstDay: 1,
-            yearRange: "-70:+0",
+            yearRange: "-5:+0",
             beforeShow: function () {
                 setTimeout(
                     function () {
@@ -297,6 +335,27 @@
                 avg[i] = avg[i].toFixed(2);
             }
 
+            $("#avgStats").html(avg[avg.length - 1] + " kg");
+
+            let denominator = Math.pow((@Model.Height)/100, 2);
+            let bmi = ((@Model.Weights.Reverse().FirstOrDefault().Weigth) / (denominator)).toFixed(2);
+            $("#bmiStats").html(bmi);
+
+            let bmiPop = "";
+            if (bmi < 18.5) {
+                bmiPop = "Underweight";
+            } else if (bmi > 18.5 && bmi < 24.9) {
+                bmiPop = "Normal";
+            }
+            else if (bmi > 24.9 && bmi < 29.9) {
+                bmiPop = "Overweight";
+            }
+            else if (bmi > 29.9) {
+                bmiPop = "Obese";
+            }
+
+            $("#bmiStats").attr("title", bmiPop);
+
             return avg;
         }
 
@@ -305,8 +364,17 @@
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
         }
+
+        $("#dropDownEntryBtn").click(function () {
+            //open up the content needed - toggle the slide - if visible, slide up, if not slidedown.
+            $("#dropDownEntries").slideToggle(1000, function () { });
+
+        });
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
     });
-</script>
+    </script>
 }
 
 @section Quote{

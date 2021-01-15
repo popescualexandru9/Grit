@@ -3,7 +3,6 @@ using Grit.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +11,7 @@ using System.Web.Mvc;
 
 namespace Grit.Controllers
 {
+    [Authorize]
     public class WeightController : Controller
     {
         private ApplicationDbContext _context;
@@ -26,26 +26,24 @@ namespace Grit.Controllers
             _context.Dispose();
         }
 
-        // GET: Weight
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         public ActionResult Progress()
         {
-            // Basically UserManager.FindById(User,Identity.GetUserId())
+            // Basically UserManager.FindById(User.Identity.GetUserId())
             var user = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
-        
+
+            // Get users all time weights objects and store them into a list. Then sort the list
             var weightsUser = _context.Weights.Where(x => x.UserId == user.Id).ToList();
             weightsUser.Sort((x, y) => x.Date.CompareTo(y.Date));
 
             var timeFrame = DateTime.Now.AddDays(-1);
+            // Search if any weight was already registered today for this user
+            var todaysWeight = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
+
             var model = new ProgressViewModel
             {
                 Weights = weightsUser,
-                TodaysWeight = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
-                                                                                                    timeFrame.Date) > 0).SingleOrDefault()
+                TodaysWeight = todaysWeight,
+                Height = user.Height ?? 0
             };
 
             return View(model);
@@ -53,43 +51,47 @@ namespace Grit.Controllers
 
         public ActionResult AddWeight(ProgressViewModel model)
         {
+            int weightEntityId;
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("Progress", "Weight", new { status = "bad" });
             }
 
-            int weightEntityId;
+            // Basically UserManager.FindById(User,Identity.GetUserId())
             var user = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+            // Format weight have 2 decimals
             decimal weight = Math.Round(decimal.Parse(model.TodaysWeight.Weigth.ToString("F")), 2);
 
+            // Check if the database contains an object at input date
             var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
                                                                                                    model.TodaysWeight.Date) == 0).SingleOrDefault();
             if (weightEntity != null)
             {
-                // If found, rewrite it
+                // If found, rewrite its weight
                 weightEntity.Weigth = weight;
                 weightEntityId = weightEntity.Id;
                 _context.SaveChanges();
             }
             else
-            {   // Create new weight and store its id
+            {   // If not, create new weight and store its id
                 weightEntityId = Create(weight, user.Id, model.TodaysWeight.Date);
             }
-          
+
             user.DailyWeight_Id = weightEntityId;
             _context.SaveChanges();
 
             return RedirectToAction("Progress", "Weight");
         }
 
-
-        public ActionResult ChangeWeight( string weightInput , DateTime dateInput)
+        public ActionResult ChangeWeight(string weightInput, DateTime dateInput)
         {
+            // Regex to check if weightInput has a decimal format since we don't store it in a model with client validations.
+            // If it is in fact a decimal string, convert it into decimal and parse it to have only 2 decimals
             Regex rx = new Regex(@"^\d+\.?\d{0,2}$");
             var rgx = rx.IsMatch(weightInput);
             if (!rgx)
             {
-                return RedirectToAction("Progress", "Weight", new { status = "bad"});
+                return RedirectToAction("Progress", "Weight", new { status = "bad" });
             }
 
             decimal d = decimal.Parse(weightInput);
@@ -98,16 +100,16 @@ namespace Grit.Controllers
             // Basically UserManager.FindById(User,Identity.GetUserId())
             var user = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
 
-
-            var weightUser = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, 
-                                                                                                dateInput.Date) == 0 ).SingleOrDefault();
+            // Check if the database contains an object at input date. It has to, so update weight
+            var weightUser = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
+                                                                                                dateInput.Date) == 0).SingleOrDefault();
             weightUser.Weigth = weight;
             _context.SaveChanges();
 
             return RedirectToAction("Progress", "Weight");
         }
 
-        public int Create(decimal weight,string userId)
+        public int Create(decimal weight, string userId)
         {
             var newWeight = new Models.Weight
             {
@@ -136,7 +138,5 @@ namespace Grit.Controllers
 
             return newWeight.Id;
         }
-
-
     }
 }

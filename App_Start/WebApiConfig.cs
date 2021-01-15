@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Xml;
 
 namespace Grit
 {
@@ -9,8 +11,6 @@ namespace Grit
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
-
             // Web API routes
             config.MapHttpAttributeRoutes();
 

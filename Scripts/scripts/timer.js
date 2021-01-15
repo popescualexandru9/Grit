@@ -39,7 +39,7 @@ $(document).ready(function () {
         }
 
         if (isTimeRunning) {
-            stopTimer();
+            onTimesUp();
             $("#start_button_timer").html("Start")
             $("#start_button_timer").css("background-color", "#006b00");
 
@@ -127,10 +127,6 @@ $(document).ready(function () {
                 onTimesUp();
             }
         }, 1000);
-    }
-
-    function stopTimer() {
-        onTimesUp();
     }
 
     function formatTimeLeft(time) {
