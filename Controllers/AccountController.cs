@@ -545,7 +545,7 @@ namespace Grit.Controllers
             weightController = new WeightController();
             weightEntityId = weightController.Create(weight, user.Id);
 
-            UpdateUser(user, user.UserName, weightEntityId, height, model.Birthdate, model.Gender, DateTime.Now);
+            UpdateUser(user, user.UserName, weightEntityId, height, model.Birthdate, model.Gender, DateTime.Now, true);
             return RedirectToAction("Index", "Home");
         }
 
@@ -641,7 +641,7 @@ namespace Grit.Controllers
 
             // Search if any weight was already registered today for this user
             var timeFrame = DateTime.Now.AddDays(-1);
-            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0);
 
             if (weightEntity != null)
             {
@@ -656,7 +656,7 @@ namespace Grit.Controllers
                 weightEntityId = weightController.Create(weight, user.Id);
             }
 
-            UpdateUser(user, model.User.UserName, weightEntityId, height, model.User.Birthdate, model.User.Gender, model.User.SignUpDate);
+            UpdateUser(user, model.User.UserName, weightEntityId, height, model.User.Birthdate, model.User.Gender, model.User.SignUpDate, false);
             return RedirectToAction("MemberDetails", "Account", new { id = user.Id, status = "ok" });
         }
 
@@ -696,7 +696,7 @@ namespace Grit.Controllers
             return RedirectToAction("Members", "Account");
         }
 
-        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate, string gender, DateTime? signUpDate)
+        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate, string gender, DateTime? signUpDate,bool AddSplits)
         {
             user.UserName = username;
             user.DailyWeight_Id = weightEntityId;
@@ -705,15 +705,20 @@ namespace Grit.Controllers
             user.Gender = gender;
             user.SignUpDate = signUpDate;
 
+          
             UserManager.Update(user);
-            AddSplitsToUser(user);
+            if (AddSplits)
+            {
+                AddSplitsToUser(user);
+            }
+           
         }
         #endregion
 
         private void AddSplitsToUser(ApplicationUser user)
         {
-            var trainingSplitFullBody = _context.TrainingSplits.Where(x => x.Id == 1008).SingleOrDefault();
-            var trainingSplitPpl = _context.TrainingSplits.Where(x => x.Id == 1012).SingleOrDefault();
+            var trainingSplitFullBody = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1008);
+            var trainingSplitPpl = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1012);
 
 
             var userSplitFullBody = new UserSplit

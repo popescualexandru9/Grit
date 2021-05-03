@@ -14,7 +14,7 @@ namespace Grit.Controllers
     [Authorize]
     public class WeightController : Controller
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public WeightController()
         {
@@ -37,7 +37,7 @@ namespace Grit.Controllers
 
             var timeFrame = DateTime.Now.AddDays(-1);
             // Search if any weight was already registered today for this user
-            var todaysWeight = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
+            var todaysWeight = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0);
 
             var model = new ProgressViewModel
             {
@@ -51,7 +51,6 @@ namespace Grit.Controllers
 
         public ActionResult AddWeight(ProgressViewModel model)
         {
-            int weightEntityId;
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("Progress", "Weight", new { status = "bad" });
@@ -63,23 +62,20 @@ namespace Grit.Controllers
             decimal weight = Math.Round(decimal.Parse(model.TodaysWeight.Weigth.ToString("F")), 2);
 
             // Check if the database contains an object at input date
-            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
-                                                                                                   model.TodaysWeight.Date) == 0).SingleOrDefault();
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
+                                                                                                   model.TodaysWeight.Date) == 0);
             if (weightEntity != null)
             {
                 // If found, rewrite its weight
                 weightEntity.Weigth = weight;
-                weightEntityId = weightEntity.Id;
-                _context.SaveChanges();
+                user.DailyWeight_Id = weightEntity.Id;
             }
             else
             {   // If not, create new weight and store its id
-                weightEntityId = Create(weight, user.Id, model.TodaysWeight.Date);
+                user.DailyWeight_Id = Create(weight, user.Id, model.TodaysWeight.Date);
+                HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().Update(user);
             }
-
-            user.DailyWeight_Id = weightEntityId;
-            _context.SaveChanges();
-
+              _context.SaveChanges();
             return RedirectToAction("Progress", "Weight");
         }
 
@@ -101,35 +97,48 @@ namespace Grit.Controllers
             var user = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
 
             // Check if the database contains an object at input date. It has to, so update weight
-            var weightUser = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
-                                                                                                dateInput.Date) == 0).SingleOrDefault();
+            var weightUser = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
+                                                                                                dateInput.Date) == 0);
             weightUser.Weigth = weight;
             _context.SaveChanges();
 
             return RedirectToAction("Progress", "Weight");
         }
 
-        public int Create(decimal weight, string userId)
+        public ActionResult RemoveEntry(DateTime dateInput)
         {
-            var newWeight = new Models.Weight
-            {
-                Weigth = weight,
-                Date = DateTime.Now,
-                UserId = userId
-            };
+            // Basically UserManager.FindById(User,Identity.GetUserId())
+            var user = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+            var weightEntry = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
+                                                                                                dateInput.Date) == 0);
 
-            _context.Weights.Add(newWeight);
+            if(weightEntry == null)
+            {
+                return Json(new { redirectToUrl = Url.Action("Progress", "Weight") });
+            }
+            if(user.DailyWeight_Id == weightEntry.Id) // Avoid EF conflict when deleting foreign key by removing the foreign key first.
+            {
+                user.DailyWeight = null;
+                user.DailyWeight_Id = null;
+
+                // ApplicationUserManager. Needed for updating the AspNetUser
+                var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                userManager.Update(user);
+            }
+
+            _context.Weights.Remove(weightEntry);
             _context.SaveChanges();
 
-            return newWeight.Id;
+            return Json(new { redirectToUrl = Url.Action("Progress", "Weight") });
         }
 
-        public int Create(decimal weight, string userId, DateTime date)
+
+        public int Create(decimal weight, string userId, DateTime? date = null)
         {
             var newWeight = new Models.Weight
             {
                 Weigth = weight,
-                Date = date,
+                Date = date ?? DateTime.Now,
                 UserId = userId
             };
 

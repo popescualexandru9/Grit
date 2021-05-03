@@ -24,8 +24,8 @@ namespace Grit.Controllers
                    return BadRequest("CateogrryId parameter is missing");*/
             try
             {
-                var forecast = await _exerciseService.GetExercises();
-                return Ok(forecast);
+                var exercises = await _exerciseService.GetExercises();
+                return Ok(exercises);
             }
             catch (OpenExerciseException e)
             {

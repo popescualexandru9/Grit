@@ -460,7 +460,8 @@ namespace Grit.Controllers
 
             // Search if any weight was already registered today
             var timeFrame = DateTime.Now.AddDays(-1);
-            var weightEntity = _context.Weights.Where(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0).SingleOrDefault();
+            var weightEntity = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now, timeFrame) > 0);
+
             if (weightEntity != null)
             {
                 // If found, rewrite its weight

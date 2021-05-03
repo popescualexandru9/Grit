@@ -332,7 +332,13 @@ dt{
 
 .trainingTable > tbody > tr > td > select option {
     color: #333 !important;
+} 
+
+.trainingTable input::placeholder {
+    color: #ccc;
 }
+
+
 
 .glyphiconCenter {
     width: 100%;
@@ -473,4 +479,3 @@ dt{
 #workoutTitle{
     cursor:default;
 }
-

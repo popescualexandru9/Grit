@@ -27,7 +27,7 @@ namespace Grit.Models
         {
             var user = _context.Users.Find(User.Identity.GetUserId());
 
-            var activeSplit = _context.TrainingSplits.Where(x => x.Id == user.ActiveWorkout_Id).SingleOrDefault();
+            var activeSplit = _context.TrainingSplits.SingleOrDefault(x => x.Id == user.ActiveWorkout_Id);
             if (activeSplit != null)
             {
                 var workouts = _context.Workouts.Where(x => x.TrainingSplit_Id == activeSplit.Id).ToList();
@@ -70,7 +70,7 @@ namespace Grit.Models
         {
             if (activeId.HasValue && activeId > 0)
             {
-                var split = _context.TrainingSplits.Where(x => x.Id == activeId).SingleOrDefault();
+                var split = _context.TrainingSplits.SingleOrDefault(x => x.Id == activeId);
                 var user = _context.Users.Find(User.Identity.GetUserId());
                 user.ActiveWorkout_Id = split.Id;
                 _context.SaveChanges();

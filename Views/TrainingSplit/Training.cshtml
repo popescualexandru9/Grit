@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Training Plan";
     SelectList RepsList = new SelectList(Enumerable.Range(1, 30));
+
 }
 
 @*Top panel*@
@@ -172,73 +173,128 @@
 
                     @for (int i = 0; i < workout.Exercises.Count; i++)
                     {
-                        <tbody>
-                            <tr>
-                                @if (trigger)
-                                {
+                        if (trigger)
+                        {
+                            <tbody style="border: 1px #fff 0 0 0;">
+                                <tr>
                                     <td style="font-size:22px; padding-left: 20px; color: rgb(102, 252, 241); border-right:1px #fff"> @workout.Exercises[i].Name</td>
-                                }
-                                else
-                                {
-                                    <td></td>
-                                }
 
-
-                                @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
-                                {
-
-                                    trigger = true;
-                                }
-                                else
-                                {
-                                    trigger = false;
-                                }
-
-
-                                <td style="text-align:center; vertical-align: middle;">
-
-                                    @if (workout.Exercises[i].ExpectedRepsFst == workout.Exercises[i].ExpectedRepsSnd)
+                                    @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
                                     {
-                                        @workout.Exercises[i].ExpectedRepsFst
+
+                                        trigger = true;
                                     }
                                     else
                                     {
-                                        @workout.Exercises[i].ExpectedRepsFst @:-  @workout.Exercises[i].ExpectedRepsSnd
+                                        trigger = false;
                                     }
 
-                                </td>
-                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].RestTime.ToString()</td>
-                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].ExpectedWeight </td>
-                                <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].Intensity</td>
 
-                                <td style="text-align:center">
-                                    @if (workout.Exercises[i].ActualReps == null)
+                                    <td style="text-align:center; vertical-align: middle;">
+
+                                        @if (workout.Exercises[i].ExpectedRepsFst == workout.Exercises[i].ExpectedRepsSnd)
+                                        {
+                                            @workout.Exercises[i].ExpectedRepsFst
+                                        }
+                                        else
+                                        {
+                                            @workout.Exercises[i].ExpectedRepsFst @:-  @workout.Exercises[i].ExpectedRepsSnd
+                                        }
+
+                                    </td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].RestTime.ToString()</td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].ExpectedWeight </td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].Intensity</td>
+
+                                    <td style="text-align:center">
+                                        @if (workout.Exercises[i].ActualReps == null)
+                                        {
+                                            @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                        RepsList, "1", new { @class = "form-control", dir = "rtl" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                        RepsList, workout.Exercises[i].ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
+
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (workout.Exercises[i].ActualWeight == null)
+                                        {
+                                            <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" placeholder=" @workout.Exercises[i].ActualWeight.ToString() kg" style=" text-align: right;" />
+                                        }
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        }
+                        else
+                        {
+                            <tbody style="border: 0;">
+                                <tr>
+                                    <td> </td>
+
+                                    @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
                                     {
-                                        @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
-                                                 RepsList, "1", new { @class = "form-control", dir = "rtl" })
+
+                                        trigger = true;
                                     }
                                     else
                                     {
-                                        @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
-                                                 RepsList, workout.Exercises[i].ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
-
-                                    }
-                                </td>
-
-                                <td>
-                                    @if (workout.Exercises[i].ActualWeight == null)
-                                    {
-                                        <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
-                                    }
-                                    else
-                                    {
-                                        <input class="form-control" placeholder=" @workout.Exercises[i].ActualWeight.ToString() kg" style=" text-align: right;" />
+                                        trigger = false;
                                     }
 
-                                </td>
-                            </tr>
 
-                        </tbody>
+                                    <td style="text-align:center; vertical-align: middle;">
+
+                                        @if (workout.Exercises[i].ExpectedRepsFst == workout.Exercises[i].ExpectedRepsSnd)
+                                        {
+                                            @workout.Exercises[i].ExpectedRepsFst
+                                        }
+                                        else
+                                        {
+                                            @workout.Exercises[i].ExpectedRepsFst @:-  @workout.Exercises[i].ExpectedRepsSnd
+                                        }
+
+                                    </td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].RestTime.ToString()</td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].ExpectedWeight </td>
+                                    <td style="text-align:center; vertical-align: middle;"> @workout.Exercises[i].Intensity</td>
+
+                                    <td style="text-align:center">
+                                        @if (workout.Exercises[i].ActualReps == null)
+                                        {
+                                            @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                        RepsList, "1", new { @class = "form-control", dir = "rtl" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownListFor(x => workout.Exercises[i].ActualReps,
+                                                        RepsList, workout.Exercises[i].ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
+
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (workout.Exercises[i].ActualWeight == null)
+                                        {
+                                            <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" placeholder=" @workout.Exercises[i].ActualWeight.ToString() kg" style="text-align: right;" />
+                                        }
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        }
                     }
                 </table>
             </div>
@@ -251,7 +307,7 @@
     <script src="@Url.Content("~/Scripts/scripts/timer.js")"></script>
     <script>
         $(document).ready(function () {
-            // Workouts list hover efect    
+            // Workouts list hover efect
             $(".panelBody").hover(function () {
                 $(this).stop().animate({
                     scrollTop: $(this)[0].scrollHeight
@@ -440,9 +496,9 @@
                 let placeholder = $("#workoutTitle").html();
 
                 let input = document.createElement("input");
-                $(input).css({ "background-color" : "transparent", "border" : "1px solid #fff ", "border-radius" : "4px"} )
-                $(input).attr("placeholder", placeholder )
-                $(input).attr("onchange", "rename(this);" )
+                $(input).css({ "background-color": "transparent", "border": "1px solid #fff ", "border-radius": "4px" })
+                $(input).attr("placeholder", placeholder)
+                $(input).attr("onchange", "rename(this);")
                 $("#workoutTitle").html(input);
             });
 

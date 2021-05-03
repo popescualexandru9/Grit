@@ -17,8 +17,11 @@
 <canvas id="line-chart"></canvas>
 
 <div class="row" style="margin-top : 50px; margin-bottom: -20px">
-    <h3 class="pull-left" style="margin : 15px 0 0 15px; cursor:pointer" id="dropDownEntryBtn">Entries
-        <span class="glyphicon glyphicon-triangle-bottom pull-right" style="font-size : 20px; top:4px; cursor:pointer">   </span></h3>
+    <h3 class="pull-left" style="margin : 15px 0 0 15px; cursor:pointer" id="dropDownEntryBtn">
+        Entries
+        <span class="glyphicon glyphicon-triangle-bottom pull-right" style="font-size : 20px; top:4px; cursor:pointer">   </span>
+    </h3>
+
     <button type="submit" class="pull-right btn btn-primary" style="margin: 10px 15px 15px 0;" data-toggle="modal" data-target="#addWeightModal">
         Add weight
     </button>
@@ -27,34 +30,39 @@
             <div class="modal-content">
                 @using (Html.BeginForm("AddWeight", "Weight", FormMethod.Post, new { }))
                 {
-                 <div class="modal-body" style="margin-left:20px;">
+                    <div class="modal-body" style="margin-left:20px;">
 
-                    <div class="form-group row" >
-                        @Html.LabelFor(m => m.TodaysWeight.Date, new { @class = "col-sm-2 control-label", style = "padding-top :7px;" })
-                        @Html.TextBoxFor(m => m.TodaysWeight.Date, "{0:dd MMM yyyy}", new
-                   {
-                       @class = "form-control datepicker col-sm-10",
-                       style = "background-color:transparent; color:#fff",
-                       autocomplete = "off",
-                       onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
-                       onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
-                       onchange = "$('#addWeightInputId').val('0.00');"
-                   })
-                    </div>
-               
-                    <div class="form-group row">
-                        @Html.LabelFor(m => m.TodaysWeight.Weigth, new { @class = "col-sm-2 control-label", style = "padding-top : 8px;" })
-                        @Html.TextBoxFor(x => x.TodaysWeight.Weigth, new { @class = "form-control col-sm-10 ", id = "addWeightInputId", required = "true" })
+                        <div class="form-group row">
+                            @Html.LabelFor(m => m.TodaysWeight.Date, new { @class = "col-sm-2 control-label", style = "padding-top :7px;" })
+                            @Html.TextBoxFor(m => m.TodaysWeight.Date, "{0:dd MMM yyyy}", new
+                       {
+                           @class = "form-control datepicker col-sm-10",
+                           style = "background-color:transparent; color:#fff",
+                           autocomplete = "off",
+                           onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                           onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });"
+                     
+                       })
+                        </div>
+
+                        <div class="form-group row">
+                            @Html.LabelFor(m => m.TodaysWeight.Weigth, new { @class = "col-sm-2 control-label", style = "padding-top : 8px;" })
+                            @Html.TextBoxFor(x => x.TodaysWeight.Weigth, new { @class = "form-control col-sm-10 ", id = "addWeightInputId", required = "true" })
+                        </div>
+
                     </div>
 
-                 </div>
-                 <div class="modal-footer">
-                    <input type="submit" value="Submit" class="btn btn-primary" />
-                 </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="removeBtnModal" type="button"> Remove </button>
+                        <input type="submit" value="Submit" class="btn btn-primary" />
+                    </div>
                 }
             </div>
         </div>
     </div>
+
+
+
 </div>
 
 <hr />
@@ -82,7 +90,7 @@
                            id = "changeWeightInputId",
                            onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
                            onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
-                           onchange = "$(this).parents().submit();"
+                           onchange = "$(this).parents().submit(); "
                        })
                         </div>
                         <br />
@@ -110,7 +118,7 @@
                     <dt>All-time low :</dt>
                     <dd>@Model.Weights.Min(x => x.Weigth) kg</dd>
 
-                    <dt>Measurments :</dt>
+                    <dt>Entries :</dt>
                     <dd>@Model.Weights.Count()</dd>
 
                     <dt>Average last 7 entries :</dt>
@@ -137,21 +145,17 @@
             end = new Date(), // end date chart
             data = [],
             labels = [],
-            min = 200, // Minimum of weights
-            max = 0;   // Maximum of weights
+            weights = {}; // dict[date]=weight used of O(1) operations
         setStart();
 
         @foreach (var day in Model.Weights)
         {
-
-            @:if (@day.Weigth < min)
-            @:min = @day.Weigth;
-            @:else if (@day.Weigth > max)
-            @:max = @day.Weigth;
-
             @:data.push('@day.Weigth');
             @:labels.push('@day.Date.ToString("dd/MM/yyyy")');
+            @:weights["@day.Date.ToString("dd/MM/yyyy")"] = @day.Weigth;
          }
+
+        // Average for the last 7 entries
         let avg = calculateAvg(data);
 
         let chart = new Chart(ctx, {
@@ -200,15 +204,15 @@
                     mode: 'label',
                     backgroundColor: "red",
                     titleFontColor: '#fff',
-                    bodyFontColor : '#fff'
+                    bodyFontColor: '#fff'
                 },
                 hover: {
                     mode: 'nearest',
                     intersect: true
-                    },
+                },
                 scales: {
                     xAxes: [{
-                        type : "time",
+                        type: "time",
                         display: true,
                         time: {
                             parser: 'DD/MM/YYYY',
@@ -229,9 +233,7 @@
                         display: true,
                         ticks: {
                             fontColor: "#fff",
-                            stepSize: 1,
-                            suggestedMin: parseInt(min)-1,
-                            suggestedMax: parseInt(max)+1
+                            stepSize: 1
                         },
                         gridLines: {
                             color: '#999',
@@ -258,8 +260,8 @@
 
             switch (value) {
                 case "One Week":
-                    start.setDate(todaysDate.getDate() - 6);
                     start.setMonth(todaysDate.getMonth());
+                    start.setDate(todaysDate.getDate() - 6);
                     break;
                 case "One Month":
                     start.setMonth(todaysDate.getMonth() - 1);
@@ -293,22 +295,6 @@
             }
             start.setHours(0, 0, 0, 0);
             chart.update();
-        });
-
-        $('.datepicker').datepicker({
-            dateFormat: 'dd M yy',
-            changeMonth: true,
-            changeYear: true,
-            maxDate: 0,
-            firstDay: 1,
-            yearRange: "-5:+0",
-            beforeShow: function () {
-                setTimeout(
-                    function () {
-                        $('#ui-datepicker-div').css('z-index', 99999);
-                    }, 100
-                )
-            }
         });
 
         function calculateAvg(data) {
@@ -373,6 +359,69 @@
         $(function () {
             $('[data-toggle="popover"]').popover()
         })
+
+
+        $('.datepicker').datepicker({
+            dateFormat: 'dd M yy',
+            changeMonth: true,
+            changeYear: true,
+            maxDate: 0,
+            firstDay: 1,
+            yearRange: "-5:+0",
+            beforeShow: function () {
+                setTimeout(
+                    function () {
+                        $('#ui-datepicker-div').css('z-index', 99999);
+                    }, 100
+                )
+            }
+        });
+
+
+        let dateModal = new Date();
+        let dateModalString =  "";
+        // Change AddWeight modal input data
+        $(".datepicker").change(function () {
+            dateModal = new Date(this.value);
+
+            let d = dateModal.getDate();
+            let m = dateModal.getMonth() + 1;
+            let y = dateModal.getFullYear();
+
+            dateModalString = (m <= 9 ? '0' + m : m) + '/' + (d <= 9 ? '0' + d : d) + '/' + y;
+            let dateString = (d <= 9 ? '0' + d : d) + '/' + (m <= 9 ? '0' + m : m) + '/' + y;
+         
+
+            $('#addWeightInputId').val(weights[dateString]);
+        });
+
+        $("#removeBtnModal").click(function () {
+
+            let date = "";
+
+            if (dateModalString) {
+                date = dateModalString + " 12:00:00 AM";
+            }
+            else {
+                date = new Date().toLocaleDateString('en-US') + " 12:00:00 AM";
+            }
+              
+
+            let data = {
+                dateInput: date
+            }
+
+            $.ajax({
+                url: "/Weight/RemoveEntry",
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: data
+            }).done(function (response) {
+                window.location.href = response.redirectToUrl;
+            })
+        });
+
     });
     </script>
 }
