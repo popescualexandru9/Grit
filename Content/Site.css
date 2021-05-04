@@ -310,6 +310,7 @@ dt{
 }
 
 /* Training table */
+
 .trainingTable{
     margin-bottom:0px !important;
 }
@@ -320,7 +321,8 @@ dt{
 }
 
 .trainingTable > tbody > tr > td {
-    border: none !important;
+    border-bottom: none !important;
+    border-top: none !important;
 }
 
 .trainingTable > tbody > tr > td > select {
@@ -338,6 +340,14 @@ dt{
     color: #ccc;
 }
 
+#trainingTableExerciseName {
+    font-size: 22px;
+    padding-left: 20px;
+    color: rgb(102, 252, 241);
+    border: 2px #fff !important;
+    vertical-align: middle;
+    text-align: center;
+}
 
 
 .glyphiconCenter {
@@ -479,3 +489,4 @@ dt{
 #workoutTitle{
     cursor:default;
 }
+

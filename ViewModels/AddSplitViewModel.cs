@@ -6,7 +6,7 @@ namespace Grit.ViewModels
     {
         public TrainingSplitValues TrainingSplitValues { get; set; }
 
-        public ICollection<Workout> Workouts { get; set; }
+        public ICollection<WorkoutViewModel> Workouts { get; set; }
     }
 
     public class TrainingSplitValues
@@ -20,20 +20,26 @@ namespace Grit.ViewModels
         public int Length { get; set; }
     }
 
-    public class Workout
+    public class WorkoutViewModel
     {
         public string Name { get; set; }
-        public ICollection<Set> Sets { get; set; }
+        public ICollection<ExerciseViewModel> Exercises { get; set; }
+    }
+    public class ExerciseViewModel
+    {
+        public string Name { get; set; }
+        public string MuscleGroup { get; set; }
+        public ICollection<SetViewModel> Sets { get; set; }
     }
 
-    public class Set
+
+    public class SetViewModel
     {
-        public string Name { get; set; }
         public ExpectedReps ExpectedReps { get; set; }
         public decimal RestTime { get; set; }
         public string ExpectedWeight { get; set; }
         public string Intensity { get; set; }
-        public string MuscleGroup { get; set; }
+
     }
 
     public class ExpectedReps

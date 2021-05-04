@@ -324,17 +324,26 @@
     <Compile Include="Migrations\202101081945365_IntToDecimalActualWeight.designer.cs">
       <DependentUpon>202101081945365_IntToDecimalActualWeight.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105031923522_AddSetModel.cs" />
+    <Compile Include="Migrations\202105031923522_AddSetModel.designer.cs">
+      <DependentUpon>202105031923522_AddSetModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105042046462_AddDateToWorkouts.cs" />
+    <Compile Include="Migrations\202105042046462_AddDateToWorkouts.designer.cs">
+      <DependentUpon>202105042046462_AddDateToWorkouts.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Exercise.cs" />
-    <Compile Include="Models\ExerciseResponse.cs" />
+    <Compile Include="Models\Training\Exercise.cs" />
+    <Compile Include="Models\Training\ExerciseResponse.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Controllers\TrainingSplitController.cs" />
-    <Compile Include="Models\TrainingSplit.cs" />
+    <Compile Include="Models\Training\Set.cs" />
+    <Compile Include="Models\Training\TrainingSplit.cs" />
     <Compile Include="Models\UserSplit.cs" />
     <Compile Include="Models\Weight.cs" />
-    <Compile Include="Models\Workout.cs" />
+    <Compile Include="Models\Training\Workout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\OpenExerciseException.cs" />
     <Compile Include="Services\OpenExerciseResponse.cs" />
@@ -782,6 +791,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202101081945365_IntToDecimalActualWeight.resx">
       <DependentUpon>202101081945365_IntToDecimalActualWeight.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105031923522_AddSetModel.resx">
+      <DependentUpon>202105031923522_AddSetModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105042046462_AddDateToWorkouts.resx">
+      <DependentUpon>202105042046462_AddDateToWorkouts.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

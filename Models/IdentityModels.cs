@@ -55,6 +55,7 @@ namespace Grit.Models
         public DbSet<Workout> Workouts { get; set; }
         public DbSet<TrainingSplit> TrainingSplits { get; set; }
         public DbSet<UserSplit> UserSplits { get; set; }
+        public DbSet<Set> Sets { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

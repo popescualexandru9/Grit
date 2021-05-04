@@ -1,8 +1,5 @@
 ﻿using Grit.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Grit.ViewModels
 {
@@ -11,7 +8,7 @@ namespace Grit.ViewModels
         public List<TrainingSplit> Splits { get; set; }
         public TrainingSplit ActiveSplit { get; set; }
         public List<WorkoutDay> WorkoutDays { get; set; }
-   
+
     }
 
     public class WorkoutDay

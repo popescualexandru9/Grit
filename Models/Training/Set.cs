@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Grit.Models
 {
-    public class Exercise
+    public class Set
     {
         public int Id { get; set; }
-
-        [Required]
-        public string Name { get; set; }
 
         [Required]
         [Range(1, 30)]
@@ -34,30 +31,24 @@ namespace Grit.Models
         public string Intensity { get; set; }
 
         [Required]
-        public string MuscleGroup { get; set; }
+        [ForeignKey("Exercise")]
+        public int Exercise_Id { get; set; }
 
-        [Required]
-        [ForeignKey("Workout")]
-        public int Workout_Id { get; set; }
+        public Exercise Exercise { get; set; }
 
-        public Workout Workout { get; set; }
-
-        public Exercise()
+        public Set()
         {
 
         }
 
-        public Exercise(string name, decimal restTime, string expectedWeight, string intensity, string muscleGroup, int expectedRepsFst, int expectedRepsSnd, int workoutId)
+        public Set(decimal restTime, string expectedWeight, string intensity, int expectedRepsFst, int expectedRepsSnd, int exerciseId)
         {
-            Name = name;
             RestTime = restTime;
             ExpectedWeight = expectedWeight;
             Intensity = intensity;
-            MuscleGroup = muscleGroup;
             ExpectedRepsFst = expectedRepsFst;
             ExpectedRepsSnd = expectedRepsSnd;
-            Workout_Id = workoutId;
+            Exercise_Id = exerciseId;
         }
-
     }
 }

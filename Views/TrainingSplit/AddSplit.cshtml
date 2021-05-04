@@ -273,7 +273,7 @@ else
                             {
                                 <fieldset class="fieldsets">
                                     <legend> @workoutDay.Exercises[i].Name</legend>
-                                    <h3 id="hidden" style="visibility: hidden; position: absolute;">@workoutDay.Exercises[i].MuscleGroup</h3>
+                                    <h3 id="muscleGroup" style="visibility: hidden; position: absolute;">@workoutDay.Exercises[i].MuscleGroup</h3>
                                     <h3 onclick="removeTable(this);" style="position: relative; margin-left: -21px; margin-top: -33px; color: rgb(255, 0, 0); cursor: pointer; width: 20px;">✕</h3>
 
                                     <table class="trainingTable table table-condensed">
@@ -360,6 +360,7 @@ else
         const weight = ["Light", "Moderate", "Heavy", "Heavier", "Same", "Drop Set"];
         const repsFst = [...Array(31).keys()].slice(1, 31);
         const repsSnd = [...Array(31).keys()].slice(1, 31);
+        const EXERCISE_API_URL = "https://localhost:44387/exerciseapi";
 
         const muscleGroup = {
             Chest: [],
@@ -393,7 +394,7 @@ else
 
         function callExerciseApi() {
             $.ajax({
-                url: "https://localhost:44387/exerciseapi"
+                url: EXERCISE_API_URL
             }).then(function (data) {
 
                 data.forEach((x) => {
@@ -581,11 +582,11 @@ else
             $(legend).html($("#modalSelectSnd").val());
             fieldSet.append(legend);
 
-            let hidden = document.createElement('h3');
-            $(hidden).html($("#modalSelectFst").val());
-            $(hidden).attr("id", "hidden");
-            $(hidden).css({ "visibility": "hidden", "position": "absolute" });
-            fieldSet.append(hidden);
+            let hiddenMuscleGroup = document.createElement('h3');
+            $(hiddenMuscleGroup).html($("#modalSelectFst").val());
+            $(hiddenMuscleGroup).attr("id", "muscleGroup");
+            $(hiddenMuscleGroup).css({ "visibility": "hidden", "position": "absolute" });
+            fieldSet.append(hiddenMuscleGroup);
 
             let removeX = document.createElement('h3');
             $(removeX).html("&#10005");
@@ -774,17 +775,16 @@ else
                     let Workouts = [];
 
                     $(".workoutDiv").each(function () {
-                        let sets = []
+                        let exercises = []
 
                         $(this).find(".fieldsets").each(function () {
                             let name = $(this).find('legend').html().toString();
-                            let muscleGroup = $(this).find('#hidden').html().toString();
-
+                            let muscleGroup = $(this).find('#muscleGroup').html().toString();
+                            let sets = []
 
                             $(this).find("tbody > tr").each(function () {
 
                                 let Set = {
-                                    Name: name,
                                     ExpectedReps: {
                                         fst: parseInt(getSelectValue($(this).find('td:nth-child(2) > select'))),
                                         snd: parseInt(getSelectValue($(this).find('td:nth-child(3) > select')))
@@ -792,16 +792,24 @@ else
                                     RestTime: parseFloat(getSelectValue($(this).find('td:nth-child(4) > select'))),
                                     ExpectedWeight: getSelectValue($(this).find('td:nth-child(5) > select')),
                                     Intensity: getSelectValue($(this).find('td:nth-child(6) > select ')),
-                                    MuscleGroup: muscleGroup
                                 };
 
                                 sets.push(Set);
+                           
                             });
+
+                            let exercise = {
+                                Name: name,
+                                MuscleGroup : muscleGroup,
+                                Sets : sets
+                            };
+
+                            exercises.push(exercise);
                         });
 
                         let workout = {
                             Name: $(this).find('.WorkoutName').val().toString(),
-                            Sets: sets
+                            Exercises: exercises
                         };
 
                         Workouts.push(workout);

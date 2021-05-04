@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,6 +12,11 @@ namespace Grit.Models
         [Required]
         public string Name { get; set; }
 
+        [Required]
+        [DataType(DataType.Date)]
+        [Display(Name = "Date")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        public DateTime Date { get; set; }
 
         [Required]
         [ForeignKey("TrainingSplit")]
@@ -29,6 +35,7 @@ namespace Grit.Models
             Name = name;
             TrainingSplit_Id = trainingSplitId;
             Exercises = new List<Exercise>();
+            Date = DateTime.Now;
         }
     }
 }
