@@ -94,6 +94,9 @@
     <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Net.Http.Headers.2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
     </Reference>
+    <Reference Include="MoreLinq, Version=3.3.2.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>packages\morelinq.3.3.2\lib\net451\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -348,12 +351,13 @@
     <Compile Include="Services\OpenExerciseException.cs" />
     <Compile Include="Services\OpenExerciseResponse.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="ViewModels\MemberDetailsViewModel.cs" />
-    <Compile Include="ViewModels\MemberProfileViewModel.cs" />
-    <Compile Include="ViewModels\MembersViewModel.cs" />
+    <Compile Include="ViewModels\Members\MemberDetailsViewModel.cs" />
+    <Compile Include="ViewModels\Members\MemberProfileViewModel.cs" />
+    <Compile Include="ViewModels\Members\MembersViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
-    <Compile Include="ViewModels\AddSplitViewModel.cs" />
-    <Compile Include="ViewModels\TrainingViewModel.cs" />
+    <Compile Include="ViewModels\Training\AddSplitViewModel.cs" />
+    <Compile Include="ViewModels\Training\HistoryViewModel.cs" />
+    <Compile Include="ViewModels\Training\TrainingViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -734,6 +738,7 @@
     <Content Include="Views\TrainingSplit\AddSplit.cshtml" />
     <Content Include="Scripts\moment.min.js.map" />
     <Content Include="Scripts\moment-with-locales.min.js.map" />
+    <Content Include="Views\TrainingSplit\History.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

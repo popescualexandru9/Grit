@@ -168,7 +168,7 @@ namespace Grit.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-              
+
                     await UserManager.AddToRoleAsync(user.Id, "Member");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
@@ -602,7 +602,8 @@ namespace Grit.Controllers
             {
                 User = user,
                 Weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id),
-                RoleName = UserManager.GetRoles(user.Id).FirstOrDefault()
+                RoleName = UserManager.GetRoles(user.Id).FirstOrDefault(),
+                ActiveSplitName = _context.TrainingSplits.FirstOrDefault(x => x.Id == user.ActiveWorkout_Id).Name
             };
             return View(detailsModel);
         }
@@ -696,7 +697,7 @@ namespace Grit.Controllers
             return RedirectToAction("Members", "Account");
         }
 
-        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate, string gender, DateTime? signUpDate,bool AddSplits)
+        private void UpdateUser(ApplicationUser user, string username, int weightEntityId, decimal height, DateTime? birthdate, string gender, DateTime? signUpDate, bool AddSplits)
         {
             user.UserName = username;
             user.DailyWeight_Id = weightEntityId;
@@ -705,13 +706,13 @@ namespace Grit.Controllers
             user.Gender = gender;
             user.SignUpDate = signUpDate;
 
-          
+
             UserManager.Update(user);
             if (AddSplits)
             {
                 AddSplitsToUser(user);
             }
-           
+
         }
         #endregion
 
@@ -727,7 +728,7 @@ namespace Grit.Controllers
                 SplitID = trainingSplitFullBody.Id
             };
 
-            var userSplitPpl= new UserSplit
+            var userSplitPpl = new UserSplit
             {
                 UserID = user.Id,
                 SplitID = trainingSplitPpl.Id

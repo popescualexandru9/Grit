@@ -82,6 +82,13 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Training Split</label>
+                    <div class="col-md-10">
+                        <input class="form-control readonly" value="@Model.ActiveSplitName" readonly />
+                    </div>
+                </div>
+
                 @Html.HiddenFor(x => x.User.Email);
                 @Html.AntiForgeryToken();
 

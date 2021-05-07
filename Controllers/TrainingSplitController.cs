@@ -1,5 +1,7 @@
 ﻿using Grit.ViewModels;
+using Grit.ViewModels.Training;
 using Microsoft.AspNet.Identity;
+using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,16 +97,16 @@ namespace Grit.Models
                 {
 
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-
+                    var i = 0;
                     foreach (var exercise in exercises)
                     {
                         var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
-                        var noSets = sets.Count();
 
-                        for (int i = 0; i < noSets; i++)
+                        foreach (var set in sets)
                         {
-                            sets[i].ActualWeight = decimal.Round(model.ActualWeight[i], 2);
-                            sets[i].ActualReps = model.ActualReps[i];
+                            set.ActualWeight = decimal.Round(model.ActualWeight[i], 2);
+                            set.ActualReps = model.ActualReps[i];
+                            i += 1;
                         }
                     }
 
@@ -114,17 +116,18 @@ namespace Grit.Models
                     // Create new workout from the previous one. Only the Date and the weight are different
                     var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id);
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+                    var i = 0;
                     foreach (var exercise in exercises)
                     {
                         var newExercise = new Exercise(exercise.Name, exercise.MuscleGroup, newWorkout.Id);
                         var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
-                        var noSets = sets.Count();
 
-                        for (int i = 0; i < noSets; i++)
+                        foreach (var set in sets)
                         {
-                            var newSet = new Set(sets[i].RestTime, sets[i].ExpectedWeight, sets[i].Intensity, sets[i].ExpectedRepsFst, sets[i].ExpectedRepsSnd, newExercise.Id);
+                            var newSet = new Set(set.RestTime, set.ExpectedWeight, set.Intensity, set.ExpectedRepsFst, set.ExpectedRepsSnd, newExercise.Id);
                             newSet.ActualWeight = decimal.Round(model.ActualWeight[i], 2);
                             newSet.ActualReps = model.ActualReps[i];
+                            i += 1;
 
                             newExercise.Sets.Add(newSet);
                         }
@@ -163,9 +166,11 @@ namespace Grit.Models
                     }
 
                     newWorkout.Exercises.Add(newExercise);
+                    newWorkout.TrainingSplit = trainingSplit;
                 }
 
                 trainingSplit.Workouts.Add(newWorkout);
+
             }
 
 
@@ -237,6 +242,68 @@ namespace Grit.Models
             return RedirectToAction("Training", "TrainingSplit");
         }
 
+        public ActionResult History()
+        {
+            var METlow = 3.5; // Metabolic equivalent of task for weight lifting low intensity
+            var METhigh = 6; // Metabolic equivalent of task for weight lifting high intensity
 
+            var user = _context.Users.Find(User.Identity.GetUserId());
+            var trainingSplits = _context.UserSplits.Where(x => x.UserID == user.Id).Select(x => x.Split.Id).ToList();
+            var workouts = _context.Workouts.Where(x => trainingSplits.Contains(x.TrainingSplit_Id)).OrderByDescending(x => x.Date).ToList();
+
+            var modelArray = new List<WorkoutSplitViewModel>();
+
+
+            foreach (var workout in workouts)
+            {
+                workout.Exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+
+                var bestSets = new List<BestSet>();
+
+                foreach (var exercise in workout.Exercises)
+                {
+                    exercise.Sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
+
+                    var exercisesVolume = exercise.Sets.Select(x =>
+                        new
+                        {
+                            volume = x.ActualWeight * x.ActualReps,
+                            weight = x.ActualWeight,
+                            reps = x.ActualReps
+                        });
+
+
+                    bestSets.Add(exercisesVolume.MaxBy(x => x.volume).Select(x =>
+                                  new BestSet { Weight = x.weight, Repetitions = x.reps }).First());
+
+
+                }
+
+                if (bestSets.MaxBy(x => x.Weight).Select(x => x.Weight).First() == null)
+                {
+                    continue;
+                }
+
+                var trainingSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id);
+                var userWeight = _context.Weights.FirstOrDefault(x => x.UserId == user.Id).Weigth;
+
+                var kcalLow = Convert.ToInt32((double)userWeight * METlow * 0.0175 * 60);
+                var kcalHigh = Convert.ToInt32((double)userWeight * METhigh * 0.0175 * 60);
+
+                modelArray.Add(new WorkoutSplitViewModel(
+                                    new WorkoutExerciseList { Workout = workout, BestSets = bestSets },
+                                    trainingSplit.Name,
+                                    new METrange { low = kcalLow, high = kcalHigh }, 0));
+            }
+
+            var model = new HistoryViewModel
+            {
+                Workouts = modelArray
+            };
+
+
+
+            return View(model);
+        }
     }
 }

@@ -19,7 +19,7 @@
 <div class="row" style="margin-top : 50px; margin-bottom: -20px">
     <h3 class="pull-left" style="margin : 15px 0 0 15px; cursor:pointer" id="dropDownEntryBtn">
         Entries
-        <span class="glyphicon glyphicon-triangle-bottom pull-right" style="font-size : 20px; top:4px; cursor:pointer">   </span>
+       @* <span class="glyphicon glyphicon-triangle-bottom pull-right" style="font-size : 20px; top:4px; cursor:pointer">*@   </span>
     </h3>
 
     <button type="submit" class="pull-right btn btn-primary" style="margin: 10px 15px 15px 0;" data-toggle="modal" data-target="#addWeightModal">
@@ -68,13 +68,13 @@
 <hr />
 
 <div class="row" >
-    <div class="col-md-6" id="dropDownEntries">
+    <div class="col-md-6 progressWeightsList" id="dropDownEntries">
         <p class="text-danger" style="margin-left : 35px; display:none">
             Weight field should contain between 0 and 2 decimals.
             <br /> Please respect the format to be able to update.
         </p>
 
-        <div >
+        <div>
             @{
                 foreach (var day in Model.Weights.Reverse())
                 {

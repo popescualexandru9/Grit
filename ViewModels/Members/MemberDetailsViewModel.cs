@@ -8,5 +8,6 @@ namespace Grit.ViewModels
         public Weight Weight { get; set; }
 
         public string RoleName { get; set; }
+        public string ActiveSplitName { get; set; }
     }
 }

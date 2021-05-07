@@ -150,12 +150,16 @@
     @*Individual workout days*@
     foreach (var workout in Model.WorkoutDays)
     {
-        var trigger = true;
+        var trigger = true; 
         <div class="panel panel-default">
             <div class="panel-heading" style="text-align:center; color:#fff; font-size:20px; cursor:pointer; color: rgb(102, 252, 241);" onclick="collapseTable(this, event);">
+
+                <span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>
+
                 @workout.Workout.Name <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
+
                 <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;" onclick="sendWeights(this);"></span>
-                <p style="position:absolute; visibility:hidden" class="hiddenWorkoutId"> @workout.Workout.Id </p>
+                <p style="position:absolute; display:none" class="hiddenWorkoutId"> @workout.Workout.Id </p>
             </div>
             <div class="panel-body table-responsive">
                 <table class="trainingTable table table-condensed ">
@@ -174,7 +178,7 @@
                     @for (int i = 0; i < workout.Exercises.Count; i++)
                     {
 
-                        <tbody style="border: 1px #fff 0 0 0;">
+                        <tbody>
                             @foreach (var set in workout.Exercises[i].Sets)
                             {
 
@@ -183,7 +187,10 @@
                                     @if (trigger == true)
                                     {
 
-                                        <td rowspan="@workout.Exercises[i].Sets.Count"  id="trainingTableExerciseName" > @workout.Exercises[i].Name</td>
+                                        <td rowspan="@workout.Exercises[i].Sets.Count"  class="trainingTableExerciseName" > 
+                                            <span style="position:relative;"> @workout.Exercises[i].Name <span class="tooltiptext">  
+                                                                               @workout.Exercises[i].MuscleGroup </span> </span>
+                                        </td>
                                         trigger = false;
                                     }
 
@@ -225,7 +232,8 @@
                                         }
                                         else
                                         {
-                                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style=" text-align: right;" />
+                                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style=" text-align: right;" 
+                                                   value="@set.ActualWeight.ToString()" />
                                         }
 
                                     </td>
@@ -236,128 +244,6 @@
                         </tbody>
                         trigger = true;
 
-                    @* if (trigger)
-            {
-            <tbody style="border: 1px #fff 0 0 0;">
-                <tr>
-                    <td style="font-size:22px; padding-left: 20px; color: rgb(102, 252, 241); border-right:1px #fff"> @workout.Exercises[i].Name</td>
-
-                    @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
-                    {
-
-                        trigger = true;
-                    }
-                    else
-                    {
-                        trigger = false;
-                    }
-
-
-                    <td style="text-align:center; vertical-align: middle;">
-
-                        @if (set.ExpectedRepsFst == set.ExpectedRepsSnd)
-                        {
-                            @set.ExpectedRepsFst
-                        }
-                        else
-                        {
-                            @set.ExpectedRepsFst @:-  @set.ExpectedRepsSnd
-                        }
-
-                    </td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.RestTime.ToString()</td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.ExpectedWeight </td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.Intensity</td>
-
-                    <td style="text-align:center">
-                        @if (set.ActualReps == null)
-                        {
-                            @Html.DropDownListFor(x => set.ActualReps,
-                                        RepsList, "1", new { @class = "form-control", dir = "rtl" })
-                        }
-                        else
-                        {
-                            @Html.DropDownListFor(x => set.ActualReps,
-                                        RepsList, set.ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
-
-                        }
-                    </td>
-
-                    <td>
-                        @if (set.ActualWeight == null)
-                        {
-                            <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
-                        }
-                        else
-                        {
-                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style=" text-align: right;" />
-                        }
-
-                    </td>
-                </tr>
-            </tbody>
-        }
-        else
-        {
-            <tbody style="border: 0;">
-                <tr>
-                    <td> </td>
-
-                    @if (i < workout.Exercises.Count - 1 && !workout.Exercises[i].Name.Equals(@workout.Exercises[i + 1].Name))
-                    {
-
-                        trigger = true;
-                    }
-                    else
-                    {
-                        trigger = false;
-                    }
-
-
-                    <td style="text-align:center; vertical-align: middle;">
-
-                        @if (set.ExpectedRepsFst == set.ExpectedRepsSnd)
-                        {
-                            @set.ExpectedRepsFst
-                        }
-                        else
-                        {
-                            @set.ExpectedRepsFst @:-  @set.ExpectedRepsSnd
-                        }
-
-                    </td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.RestTime.ToString()</td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.ExpectedWeight </td>
-                    <td style="text-align:center; vertical-align: middle;"> @set.Intensity</td>
-
-                    <td style="text-align:center">
-                        @if (set.ActualReps == null)
-                        {
-                            @Html.DropDownListFor(x => set.ActualReps,
-                                        RepsList, "1", new { @class = "form-control", dir = "rtl" })
-                        }
-                        else
-                        {
-                            @Html.DropDownListFor(x => set.ActualReps,
-                                        RepsList, set.ActualReps.ToString(), new { @class = "form-control", dir = "rtl" })
-
-                        }
-                    </td>
-
-                    <td>
-                        @if (set.ActualWeight == null)
-                        {
-                            <input class="form-control" placeholder=" 0.00 kg" style=" text-align: right;" />
-                        }
-                        else
-                        {
-                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style="text-align: right;" />
-                        }
-
-                    </td>
-                </tr>
-            </tbody>
-        }*@
                     }
                 </table>
             </div>
@@ -588,10 +474,13 @@
         // Collapse feature for each individual workout
         function collapseTable(panelHeading, e) {
             // Stops Workouts collapse feature when clicking on check icon
-            if (e.target.className.includes("glyphicon-ok-circle")) {
+            if (e.target.className.includes("glyphicon-ok-circle") || e.target.className.includes("glyphicon-play") || e.target.className.includes("glyphicon-pause")) 
+            {
                 e.stopPropagation();
                 return;
             }
+
+
 
             let toggler = $(panelHeading).next().eq(0);
             let title = $(panelHeading).clone()    //clone the element
@@ -603,10 +492,18 @@
             toggler.slideToggle(300, function () {
 
                 if ($(toggler).is(":visible")) {
-                    $(panelHeading).html(title + ' <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>  <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;" onclick="sendWeights(this);" ></span>');
+                    $(panelHeading).html(
+                         `<span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>`
+                          + title +
+                         `<span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
+                          <span class= "pull-right glyphicon glyphicon-ok-circle" style = "font-size : 23px;" onclick = "sendWeights(this);" ></span> `);
                 }
                 else {
-                    $(panelHeading).html(title + ' <span class="glyphicon glyphicon-menu-up" style="color:#66fcf1"> </span>  <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;"  onclick="sendWeights(this);" ></span>');
+                    $(panelHeading).html(
+                        `<span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>`
+                         + title + 
+                        `<span class="glyphicon glyphicon-menu-up" style="color:#66fcf1"> </span>  
+                         <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;"  onclick="sendWeights(this);"></span>`);
                 }
             });
         };
@@ -651,6 +548,21 @@
                 });
             }
 
+        }
+
+        // Starts workout timer
+        function startWorkoutTimer(icon) {
+            if ($(icon).hasClass('glyphicon-play')) {
+                $(icon).removeClass('glyphicon-play');
+                $(icon).addClass('glyphicon-pause');
+                $(icon).css('color', 'red');
+            }
+            else
+            {
+                $(icon).removeClass('glyphicon-pause');
+                $(icon).addClass('glyphicon-play');
+                $(icon).css('color', '#66fcf1');
+            }
         }
 
     </script>

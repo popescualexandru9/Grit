@@ -196,6 +196,30 @@ dt{
     }
 }
 
+.progressWeightsList {
+max-height: 450px;
+overflow-y: scroll;
+/*-ms-overflow-style: none;*/ /* IE and Edge */
+/*scrollbar-width: none;*/ /* Firefox */
+}
+
+.progressWeightsList::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.2);
+    border-radius: 50px;
+}
+
+.progressWeightsList::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 50px;
+}
+
+.progressWeightsList::-webkit-scrollbar-thumb {
+    background-color: #66fcf1;
+    border: 2px solid ##000000;
+    border-radius: 50px;
+}
+
+
 /* Training Page*/
 .panelTraining {
     -webkit-box-shadow: 0 2px 2px 2px rgba(255, 255, 255, 0.5);
@@ -340,13 +364,44 @@ dt{
     color: #ccc;
 }
 
-#trainingTableExerciseName {
+.trainingTableExerciseName {
     font-size: 22px;
     padding-left: 20px;
     color: rgb(102, 252, 241);
     border: 2px #fff !important;
-    vertical-align: middle;
+    vertical-align: middle !important;
     text-align: center;
+}
+
+.trainingTableExerciseName .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #fff;
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -60px;
+    font-size:17px;
+}
+
+.trainingTableExerciseName .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #fff transparent transparent transparent;
+}
+
+.trainingTableExerciseName:hover .tooltiptext {
+    visibility: visible;
 }
 
 
@@ -490,3 +545,66 @@ dt{
     cursor:default;
 }
 
+/* History Card */
+.card {
+    margin-top: 30px;
+    background-color: transparent;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.1), 0 6px 20px 0 rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.7), 0 6px 20px 0 rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.card .card-header {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 6px 6px 0 0;
+    padding: 8px;
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+
+}
+
+.card .card-body {
+    padding: 12px;
+    display: table;
+    width: 100%;
+    font-size: 16px;
+}
+
+
+.card .card-icons {
+    font-weight:100;
+
+}
+
+.card .card-icons .glyphicon {
+    font-weight: 400;
+    color: #66fcf1;
+}
+
+
+.card .card-left {
+    position: relative;
+    float: left;
+}
+
+.card .card-right {
+    position: relative;
+    float: right;
+}
+
+.card-exercise{
+    margin-top:30px;
+}
+
+.card-exercise h4 {
+    margin: 5px 0;
+}
+
+.table > tbody + tbody {
+    border-top: 0.1px solid #ddd !important;
+}

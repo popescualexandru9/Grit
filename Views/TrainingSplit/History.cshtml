@@ -1,0 +1,63 @@
+﻿@model  Grit.ViewModels.Training.HistoryViewModel
+@{
+    ViewBag.Title = "Workout History";
+    var cntClearfix = 1;
+}
+
+
+<div class="row">
+    @foreach (var workout in Model.Workouts)
+    {
+        <div class="col-lg-4">
+            <div class="card card-default">
+                <div class="card-header">@workout.TrainingSplitName</div>
+                <div class="card-body">
+                    <h2 style="margin:10px 0">@workout.WorkoutList.Workout.Name</h2>
+                    <div style="margin:10px 0">
+                        <span class="card-icons">
+                            <span class="glyphicon glyphicon-fire" style="color:red;"> </span>
+                            @workout.KcalBurned.low -@workout.KcalBurned.high kcal
+                        </span>
+
+                        <span class="card-icons pull-right" style="margin-top:10px;">
+                            <span class="glyphicon glyphicon-calendar"> </span>
+                            @workout.WorkoutList.Workout.Date.ToString("dd MMM yyy")
+                        </span>
+                        <br />
+                        <span class="card-icons">
+                            <span class="glyphicon glyphicon-time"> </span>
+                            115 min
+                        </span>
+
+                    </div>
+
+                    <div class="card-exercise">
+                        <div class="pull-left">
+                            <h4>Exercise </h4>
+                            @foreach (var exercise in workout.WorkoutList.Workout.Exercises)
+                            {
+                            <p> @exercise.Sets.Count() x @exercise.Name</p>
+                            }
+                        </div>
+                        <div class="pull-right">
+                            <h4>Best Set </h4>
+                            @foreach (var exercise in workout.WorkoutList.BestSets)
+                            {
+                                <p> @exercise.Weight kg x @exercise.Repetitions</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        cntClearfix++;
+    }
+
+    @if (cntClearfix % 3 == 0)
+    {
+        <div class="clearfix"></div>
+
+    }   
+
+
+</div>

@@ -28,6 +28,7 @@
                         if (User.IsInRole("Admin") || User.IsInRole("Employee"))
                         {
                             <li>@Html.ActionLink("Training", "Training", "TrainingSplit")</li>
+                            <li>@Html.ActionLink("History", "History", "TrainingSplit")</li>
                             <li>@Html.ActionLink("Progress", "Progress", "Weight")</li>
                             <li>@Html.ActionLink("Members", "Members", "Account")</li>
                         }
