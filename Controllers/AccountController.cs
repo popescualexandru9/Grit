@@ -598,12 +598,21 @@ namespace Grit.Controllers
                 throw new HttpException(404, "Can't find user by id.");
             }
 
+            var activeSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == user.ActiveWorkout_Id);
+            var activeSplitName = "";
+
+            if (activeSplit != null)
+            {
+                activeSplitName = activeSplit.Name;
+            }
+
+
             var detailsModel = new MemberDetailsViewModel
             {
                 User = user,
                 Weight = _context.Weights.SingleOrDefault(x => x.Id == user.DailyWeight_Id),
                 RoleName = UserManager.GetRoles(user.Id).FirstOrDefault(),
-                ActiveSplitName = _context.TrainingSplits.FirstOrDefault(x => x.Id == user.ActiveWorkout_Id).Name
+                ActiveSplitName = activeSplitName
             };
             return View(detailsModel);
         }

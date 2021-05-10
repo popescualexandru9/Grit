@@ -13,6 +13,8 @@ namespace Grit.Models
     public class TrainingSplitController : Controller
     {
         private ApplicationDbContext _context;
+        private static readonly double METlow = 3.5; // Metabolic equivalent of task for weight lifting low intensity
+        private static readonly double METhigh = 6; // Metabolic equivalent of task for weight lifting high intensity
 
         public TrainingSplitController()
         {
@@ -24,7 +26,6 @@ namespace Grit.Models
             _context.Dispose();
         }
 
-        // GET: TrainingPlan
         [HttpGet]
         public ActionResult Training()
         {
@@ -93,8 +94,10 @@ namespace Grit.Models
             {
                 var workout = _context.Workouts.FirstOrDefault(x => x.Id == model.WorkoutId);
                 // If the workout happened today, modify this one. Else create a copy of that workout for todays date
+
                 if (workout.Date.Date == DateTime.Now.Date)
                 {
+                    workout.TimeSpan = model.TimeSpan;
 
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
                     var i = 0;
@@ -114,7 +117,7 @@ namespace Grit.Models
                 else
                 {
                     // Create new workout from the previous one. Only the Date and the weight are different
-                    var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id);
+                    var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id, model.TimeSpan);
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
                     var i = 0;
                     foreach (var exercise in exercises)
@@ -141,7 +144,7 @@ namespace Grit.Models
 
                 }
                 _context.SaveChanges();
-                return Json(new { redirectToUrl = Url.Action("Index", "Home") });
+                return Json(new { redirectToUrl = Url.Action("History", "TrainingSplit") });
             }
         }
 
@@ -154,7 +157,7 @@ namespace Grit.Models
 
             foreach (var workoutModel in model.Workouts)
             {
-                var newWorkout = new Workout(workoutModel.Name, trainingSplit.Id);
+                var newWorkout = new Workout(workoutModel.Name, trainingSplit.Id, trainingSplit.Length);
                 foreach (var exerciseModel in workoutModel.Exercises)
                 {
                     var newExercise = new Exercise(exerciseModel.Name, exerciseModel.MuscleGroup, newWorkout.Id);
@@ -244,9 +247,6 @@ namespace Grit.Models
 
         public ActionResult History()
         {
-            var METlow = 3.5; // Metabolic equivalent of task for weight lifting low intensity
-            var METhigh = 6; // Metabolic equivalent of task for weight lifting high intensity
-
             var user = _context.Users.Find(User.Identity.GetUserId());
             var trainingSplits = _context.UserSplits.Where(x => x.UserID == user.Id).Select(x => x.Split.Id).ToList();
             var workouts = _context.Workouts.Where(x => trainingSplits.Contains(x.TrainingSplit_Id)).OrderByDescending(x => x.Date).ToList();
@@ -257,7 +257,6 @@ namespace Grit.Models
             foreach (var workout in workouts)
             {
                 workout.Exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-
                 var bestSets = new List<BestSet>();
 
                 foreach (var exercise in workout.Exercises)
@@ -279,21 +278,22 @@ namespace Grit.Models
 
                 }
 
+                // If the values for weight are null it means it's the workout created as default (NOT performed yet)
                 if (bestSets.MaxBy(x => x.Weight).Select(x => x.Weight).First() == null)
                 {
                     continue;
                 }
 
-                var trainingSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id);
+                var trainingSplitName = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id).Name;
                 var userWeight = _context.Weights.FirstOrDefault(x => x.UserId == user.Id).Weigth;
 
-                var kcalLow = Convert.ToInt32((double)userWeight * METlow * 0.0175 * 60);
-                var kcalHigh = Convert.ToInt32((double)userWeight * METhigh * 0.0175 * 60);
+                var kcalLow = Convert.ToInt32((double)userWeight * METlow * 0.0175 * workout.TimeSpan);
+                var kcalHigh = Convert.ToInt32((double)userWeight * METhigh * 0.0175 * workout.TimeSpan);
 
                 modelArray.Add(new WorkoutSplitViewModel(
                                     new WorkoutExerciseList { Workout = workout, BestSets = bestSets },
-                                    trainingSplit.Name,
-                                    new METrange { low = kcalLow, high = kcalHigh }, 0));
+                                    trainingSplitName,
+                                    new METrange { low = kcalLow, high = kcalHigh }));
             }
 
             var model = new HistoryViewModel
@@ -301,9 +301,55 @@ namespace Grit.Models
                 Workouts = modelArray
             };
 
-
-
             return View(model);
+        }
+
+        public ActionResult HistoryDetails(int id)
+        {
+            var user = _context.Users.Find(User.Identity.GetUserId());
+            var workout = _context.Workouts.FirstOrDefault(x => x.Id == id);
+            workout.Exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+
+            foreach (var exercise in workout.Exercises)
+            {
+                exercise.Sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
+            }
+
+            var trainingSplitName = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id).Name;
+            var userWeight = _context.Weights.FirstOrDefault(x => x.UserId == user.Id).Weigth;
+
+            var kcalLow = Convert.ToInt32((double)userWeight * METlow * 0.0175 * workout.TimeSpan);
+            var kcalHigh = Convert.ToInt32((double)userWeight * METhigh * 0.0175 * workout.TimeSpan);
+
+            return PartialView(new WorkoutSplitViewModel(
+                                new WorkoutExerciseList { Workout = workout, BestSets = null },
+                                trainingSplitName,
+                                new METrange { low = kcalLow, high = kcalHigh }));
+        }
+
+
+        public ActionResult ModifyWorkout(FinishWorkoutViewModel model)
+        {
+            var workout = _context.Workouts.FirstOrDefault(x => x.Id == model.WorkoutId);
+            workout.TimeSpan = model.TimeSpan;
+
+
+            workout.Exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+            var i = 0;
+            foreach (var exercise in workout.Exercises)
+            {
+                exercise.Sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
+
+                foreach (var set in exercise.Sets)
+                {
+                    set.ActualWeight = model.ActualWeight[i];
+                    set.ActualReps = model.ActualReps[i];
+                    i += 1;
+                }
+            }
+
+            _context.SaveChanges();
+            return Json(new { redirectToUrl = Url.Action("History", "TrainingSplit") });
         }
     }
 }

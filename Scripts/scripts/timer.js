@@ -130,7 +130,7 @@ $(document).ready(function () {
     }
 
     function formatTimeLeft(time) {
-        let minutes = Math.floor(time / 60);
+        let minutes = Math.floor( time / 60);
         let seconds = time % 60;
 
         if (seconds < 10) {
@@ -139,9 +139,7 @@ $(document).ready(function () {
         if (minutes < 10 && minutes > 0) {
             minutes = `0${minutes}`;
         }
-        if (minutes < 1) {
-            minutes = `0${minutes}`;
-        }
+      
 
 
         return `${minutes}:${seconds}`;

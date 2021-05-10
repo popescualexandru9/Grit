@@ -20,6 +20,8 @@ namespace Grit.ViewModels
     public class FinishWorkoutViewModel
     {
         public int WorkoutId { get; set; }
+
+        public int TimeSpan { get; set; }
         public List<decimal> ActualWeight { get; set; }
         public List<int> ActualReps { get; set; }
     }

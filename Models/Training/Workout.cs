@@ -18,6 +18,8 @@ namespace Grit.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
         public DateTime Date { get; set; }
 
+        public int? TimeSpan { get; set; }
+
         [Required]
         [ForeignKey("TrainingSplit")]
         public int TrainingSplit_Id { get; set; }
@@ -30,12 +32,13 @@ namespace Grit.Models
 
         }
 
-        public Workout(string name, int trainingSplitId)
+        public Workout(string name, int trainingSplitId, int? timeSpan)
         {
             Name = name;
             TrainingSplit_Id = trainingSplitId;
             Exercises = new List<Exercise>();
             Date = DateTime.Now;
+            TimeSpan = timeSpan;
         }
     }
 }

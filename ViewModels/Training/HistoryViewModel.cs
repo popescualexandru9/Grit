@@ -10,19 +10,16 @@ namespace Grit.ViewModels.Training
 
     public class WorkoutSplitViewModel
     {
-        public WorkoutExerciseList WorkoutList { get; set; }
+        public WorkoutExerciseList WorkoutBundle { get; set; }
         public string TrainingSplitName { get; set; }
         public METrange KcalBurned { get; set; }
-        public int WorkoutLength { get; set; }
 
 
-
-        public WorkoutSplitViewModel(WorkoutExerciseList workoutList, string trainingSplitName, METrange kcalBurned, int workoutLength)
+        public WorkoutSplitViewModel(WorkoutExerciseList workoutBundle, string trainingSplitName, METrange kcalBurned)
         {
-            WorkoutList = workoutList;
+            WorkoutBundle = workoutBundle;
             TrainingSplitName = trainingSplitName;
             KcalBurned = kcalBurned;
-            WorkoutLength = workoutLength;
         }
     }
 

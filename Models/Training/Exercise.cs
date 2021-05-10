@@ -21,7 +21,7 @@ namespace Grit.Models
 
         public Workout Workout { get; set; }
 
-        public ICollection<Set> Sets { get; set; }
+        public IList<Set> Sets { get; set; }
 
         public Exercise()
         {

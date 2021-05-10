@@ -7,6 +7,7 @@
 
 @*Top panel*@
 <div class="panel panel-default" id="panelTraining">
+
     <div class="panel-heading" role="button" data-toggle="collapse" data-target="#collapseBody" style="font-size : 24px;">
 
         @if (Model.ActiveSplit == null)
@@ -150,16 +151,20 @@
     @*Individual workout days*@
     foreach (var workout in Model.WorkoutDays)
     {
-        var trigger = true; 
+        var trigger = true;
         <div class="panel panel-default">
             <div class="panel-heading" style="text-align:center; color:#fff; font-size:20px; cursor:pointer; color: rgb(102, 252, 241);" onclick="collapseTable(this, event);">
 
-                <span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>
+                <span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);">
+                    <span class="workoutTimer"></span>
+                </span>
 
-                @workout.Workout.Name <span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
+                @workout.Workout.Name
 
+                <span class="glyphicon glyphicon-menu-down workoutName" style="color:#66fcf1"> </span>
                 <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;" onclick="sendWeights(this);"></span>
-                <p style="position:absolute; display:none" class="hiddenWorkoutId"> @workout.Workout.Id </p>
+
+                <p style="position:absolute; display:none" class="hiddenWorkoutId">@workout.Workout.Id</p>
             </div>
             <div class="panel-body table-responsive">
                 <table class="trainingTable table table-condensed ">
@@ -187,9 +192,12 @@
                                     @if (trigger == true)
                                     {
 
-                                        <td rowspan="@workout.Exercises[i].Sets.Count"  class="trainingTableExerciseName" > 
-                                            <span style="position:relative;"> @workout.Exercises[i].Name <span class="tooltiptext">  
-                                                                               @workout.Exercises[i].MuscleGroup </span> </span>
+                                        <td rowspan="@workout.Exercises[i].Sets.Count" class="trainingTableExerciseName">
+                                            <span style="position:relative;">
+                                                @workout.Exercises[i].Name <span class="tooltiptext">
+                                                    @workout.Exercises[i].MuscleGroup
+                                                </span>
+                                            </span>
                                         </td>
                                         trigger = false;
                                     }
@@ -232,7 +240,7 @@
                                         }
                                         else
                                         {
-                                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style=" text-align: right;" 
+                                            <input class="form-control" placeholder=" @set.ActualWeight.ToString() kg" style=" text-align: right;"
                                                    value="@set.ActualWeight.ToString()" />
                                         }
 
@@ -423,7 +431,7 @@
 
             // Select one specific workout from workouts list
             $(".panelBody").dblclick(function () {
-                var data = {
+                let data = {
                     activeId: activeId = $(this).find(".hiddenId").val()
                 };
 
@@ -451,10 +459,22 @@
                 $("#workoutTitle").html(input);
             });
 
+
+            // global (dinamically named) created variable
+            // Using this logic to have an unique timeElapsed variable for each workout
+            window.timeElapsed = [];
+
+            var ids = $(".hiddenWorkoutId").map(function () {
+                let workoutId = this.innerHTML;
+                window["timeElapsed" + workoutId] = 0;
+                      
+            }).get();
+
+  
         });
         // Sends rename value to the controller
         function rename(input) {
-            var data = {
+            let data = {
                 name: $(input).val()
             };
 
@@ -474,8 +494,8 @@
         // Collapse feature for each individual workout
         function collapseTable(panelHeading, e) {
             // Stops Workouts collapse feature when clicking on check icon
-            if (e.target.className.includes("glyphicon-ok-circle") || e.target.className.includes("glyphicon-play") || e.target.className.includes("glyphicon-pause")) 
-            {
+            if (e.target.className.includes("glyphicon-ok-circle") || e.target.className.includes("glyphicon-play") ||
+                e.target.className.includes("glyphicon-pause") || e.target.className.includes("workoutTimer")) {
                 e.stopPropagation();
                 return;
             }
@@ -492,21 +512,19 @@
             toggler.slideToggle(300, function () {
 
                 if ($(toggler).is(":visible")) {
-                    $(panelHeading).html(
-                         `<span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>`
-                          + title +
-                         `<span class="glyphicon glyphicon-menu-down" style="color:#66fcf1"> </span>
-                          <span class= "pull-right glyphicon glyphicon-ok-circle" style = "font-size : 23px;" onclick = "sendWeights(this);" ></span> `);
+                    $(panelHeading).find(".workoutName").removeClass('glyphicon-menu-up');
+                    $(panelHeading).find(".workoutName").addClass('glyphicon-menu-down');
                 }
                 else {
-                    $(panelHeading).html(
-                        `<span class="pull-left glyphicon glyphicon-play" style="font-size : 23px;" onclick="startWorkoutTimer(this);"></span>`
-                         + title + 
-                        `<span class="glyphicon glyphicon-menu-up" style="color:#66fcf1"> </span>  
-                         <span class="pull-right glyphicon glyphicon-ok-circle" style="font-size : 23px;"  onclick="sendWeights(this);"></span>`);
+                    $(panelHeading).find(".workoutName").removeClass('glyphicon-menu-down');
+                    $(panelHeading).find(".workoutName").addClass('glyphicon-menu-up');
                 }
             });
         };
+
+        let isTimeRunning = false;
+        let timerInterval = null;
+
 
         // Sends weight data to database
         function sendWeights(icon) {
@@ -528,9 +546,14 @@
                 }
             });
 
+            // Stop workout timer
+            clearInterval(timerInterval);
+            isTimeRunning = false;
+
             if (ok) {
                 let valdata = {
                     WorkoutId: hiddenWorkoutId,
+                    TimeSpan: Math.round(window["timeElapsed" + hiddenWorkoutId] / 60),
                     ActualWeight: actualWeight,
                     ActualReps: actualReps
                 };
@@ -552,17 +575,72 @@
 
         // Starts workout timer
         function startWorkoutTimer(icon) {
+            if (isTimeRunning && $(icon).hasClass('glyphicon-play')) {
+                bootbox.alert({
+                    message: "<strong style='color:red'> A timer is already running! </strong> Stop it so you can start this one. ",
+                });
+                return;
+            }
+
+            disableButtons();
+
+            // If timer is paused
             if ($(icon).hasClass('glyphicon-play')) {
                 $(icon).removeClass('glyphicon-play');
                 $(icon).addClass('glyphicon-pause');
                 $(icon).css('color', 'red');
+
+
+
+                timerInterval = setInterval(() => {
+                    isTimeRunning = true;
+
+                    timerId = $(icon).eq(0).parent().find(".hiddenWorkoutId").html();
+                    window["timeElapsed" + timerId] += 1;
+
+                    $(icon).find(".workoutTimer").html(formatTime(window["timeElapsed" + timerId]));
+                   
+
+
+                    if (window["timeElapsed" + timerId] >= 36000000) // 10hours
+                        return;
+                }, 1000);
+
             }
-            else
-            {
+            else {
                 $(icon).removeClass('glyphicon-pause');
                 $(icon).addClass('glyphicon-play');
                 $(icon).css('color', '#66fcf1');
+
+                clearInterval(timerInterval);
+                isTimeRunning = false;
             }
+        }
+
+        function formatTime(time) {
+            let minutes = Math.floor(time / 60);
+            let hours = Math.floor(minutes / 60);
+            let seconds = time % 60;
+
+            if (seconds < 10) {
+                seconds = `0${seconds}`;
+            }
+            if (minutes < 10 && minutes > 0) {
+                minutes = `0${minutes}`;
+            }
+
+            hours = `0${hours}`;
+
+            if (hours > 0) {
+                return `${hours}:${minutes}:${seconds}`;
+            }
+
+            return `${minutes}:${seconds}`;
+        }
+
+        function disableButtons() {
+            $(".glyphicon").css("pointer-events", "none");
+            setTimeout(function () { $(".glyphicon").css("pointer-events", "auto")} , 1100); 
         }
 
     </script>

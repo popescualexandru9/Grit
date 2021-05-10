@@ -100,7 +100,7 @@
             }
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6" style="margin-top:30px;">
         <div class="panel panel-default" id="panelProgress">
             <div class="panel-heading">
                 <h3 class="panel-title">Statistics</h3>
@@ -108,9 +108,8 @@
             <div class="panel-body" >
                 <dl class="dl-horizontal" style="margin-left :15px;">
 
-
-                    <dt data-toggle="tooltip" data-placement="right" title="For most adults, an ideal BMI is in the 18.5 to 24.9 range">BMI :</dt>
-                    <dd data-toggle="tooltip" data-placement="left" title="" id="bmiStats"> </dd>
+                    <dt class="progressTooltip">BMI : <span class="tooltiptext"> For most adults, an ideal BMI is in the 18.5 to 24.9 range </span> </dt>
+                    <dd id="bmiStats">  </dd>
 
                     <dt>All-time high :</dt>
                     <dd>@Model.Weights.Max(x => x.Weigth) kg</dd>
@@ -339,8 +338,7 @@
             else if (bmi > 29.9) {
                 bmiPop = "Obese";
             }
-
-            $("#bmiStats").attr("title", bmiPop);
+            $("#bmiStats").append(`<span class="tooltiptext">` + bmiPop + `</span>`);
 
             return avg;
         }
@@ -356,9 +354,6 @@
             $("#dropDownEntries").slideToggle(1000, function () { });
 
         });
-        $(function () {
-            $('[data-toggle="popover"]').popover()
-        })
 
 
         $('.datepicker').datepicker({

@@ -199,8 +199,6 @@ dt{
 .progressWeightsList {
 max-height: 450px;
 overflow-y: scroll;
-/*-ms-overflow-style: none;*/ /* IE and Edge */
-/*scrollbar-width: none;*/ /* Firefox */
 }
 
 .progressWeightsList::-webkit-scrollbar-track {
@@ -218,6 +216,50 @@ overflow-y: scroll;
     border: 2px solid ##000000;
     border-radius: 50px;
 }
+
+
+.progressTooltip .tooltiptext {
+    visibility: hidden;
+    width: 90%;
+    background-color: #fff;
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+    position: absolute;
+    z-index: 1;
+    margin-bottom: 30px;
+    top: 3%;
+    left: 5%;
+    font-size: 16px;
+}
+
+#bmiStats .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #fff;
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+    position: absolute;
+    z-index: 1;
+    margin-bottom: 30px;
+    top: 3%;
+    left: 41%;
+    font-size: 16px;
+}
+
+
+.progressTooltip:hover .tooltiptext,
+#bmiStats:hover .tooltiptext {
+    visibility: visible;
+}
+
+.progressTooltip:hover, #bmiStats:hover {
+    cursor: help;
+}
+
 
 
 /* Training Page*/
@@ -258,15 +300,18 @@ overflow-y: scroll;
     top: -8px;
     padding-left: 11px;
     user-select: none;
+    opacity:0.5;
 }
 
 .panelBody2 > a:hover {
     text-decoration: none;
+    opacity: 1;
 }
 
 .panelBody2 > a:hover:before {
     color: #66fcf1;
     text-decoration: none;
+ 
 }
 
 .subtitle {
@@ -403,6 +448,19 @@ overflow-y: scroll;
 .trainingTableExerciseName:hover .tooltiptext {
     visibility: visible;
 }
+
+.trainingTableExerciseName:hover  {
+    cursor: help;
+}
+
+.workoutTimer {
+    position: absolute;
+    color: #fff;
+    font-size: 20px;
+    font-family: Monaco, monospace;
+    margin: 4px 0 0 8px;
+}
+
 
 
 .glyphiconCenter {
@@ -545,17 +603,20 @@ overflow-y: scroll;
     cursor:default;
 }
 
+/* History Page */
 /* History Card */
 .card {
     margin-top: 30px;
     background-color: transparent;
     border-radius: 2px;
     box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.1), 0 6px 20px 0 rgba(255, 255, 255, 0.1);
+
 }
 
 .card:hover {
     box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.7), 0 6px 20px 0 rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
+    cursor: pointer;
 }
 
 .card .card-header {
@@ -575,13 +636,11 @@ overflow-y: scroll;
     font-size: 16px;
 }
 
-
-.card .card-icons {
+.card-icons {
     font-weight:100;
 
 }
-
-.card .card-icons .glyphicon {
+.card-icons .glyphicon {
     font-weight: 400;
     color: #66fcf1;
 }
@@ -607,4 +666,52 @@ overflow-y: scroll;
 
 .table > tbody + tbody {
     border-top: 0.1px solid #ddd !important;
+}
+
+
+/* History Details */
+
+.onerm .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #fff;
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    padding: 2px 0;
+    position: absolute;
+    z-index: 1;
+    margin-bottom: 30px;
+    top: 3%;
+    left: 41%;
+    font-size: 16px;
+}
+
+.onerm.:hover .tooltiptext, {
+    visibility: visible;
+}
+
+.onerm:hover {
+    cursor: help;
+}
+
+.setNumber {
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    padding: 4px 4px 4px 7px;
+    background: #000;
+    border: 1px solid #66fcf1;
+    color: #66fcf1;
+    font-weight:bold !important;
+    text-align: center;
+    font: 16px Arial, sans-serif;
+}
+.inputHistory {
+    text-align: left;
+    border-radius: 8px;
+    background: transparent;
+    border-color: rgb(255,255,255,0.4);
+    z-index: 100000;
+    text-align:right;
 }

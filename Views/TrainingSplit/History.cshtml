@@ -9,24 +9,25 @@
     @foreach (var workout in Model.Workouts)
     {
         <div class="col-lg-4">
-            <div class="card card-default">
+            <div class="card card-default workoutModal" 
+                 data-targeturl="@Url.Action("HistoryDetails","TrainingSplit",new { id = workout.WorkoutBundle.Workout.Id})">
                 <div class="card-header">@workout.TrainingSplitName</div>
                 <div class="card-body">
-                    <h2 style="margin:10px 0">@workout.WorkoutList.Workout.Name</h2>
+                    <h2 style="margin:10px 0">@workout.WorkoutBundle.Workout.Name</h2>
                     <div style="margin:10px 0">
                         <span class="card-icons">
                             <span class="glyphicon glyphicon-fire" style="color:red;"> </span>
-                            @workout.KcalBurned.low -@workout.KcalBurned.high kcal
+                            @workout.KcalBurned.low - @workout.KcalBurned.high kcal
                         </span>
 
                         <span class="card-icons pull-right" style="margin-top:10px;">
                             <span class="glyphicon glyphicon-calendar"> </span>
-                            @workout.WorkoutList.Workout.Date.ToString("dd MMM yyy")
+                            @workout.WorkoutBundle.Workout.Date.ToString("dd MMM yyy")
                         </span>
                         <br />
                         <span class="card-icons">
                             <span class="glyphicon glyphicon-time"> </span>
-                            115 min
+                            @workout.WorkoutBundle.Workout.TimeSpan min
                         </span>
 
                     </div>
@@ -34,14 +35,14 @@
                     <div class="card-exercise">
                         <div class="pull-left">
                             <h4>Exercise </h4>
-                            @foreach (var exercise in workout.WorkoutList.Workout.Exercises)
+                            @foreach (var exercise in workout.WorkoutBundle.Workout.Exercises)
                             {
-                            <p> @exercise.Sets.Count() x @exercise.Name</p>
+                                <p> @exercise.Sets.Count() x @exercise.Name</p>
                             }
                         </div>
                         <div class="pull-right">
                             <h4>Best Set </h4>
-                            @foreach (var exercise in workout.WorkoutList.BestSets)
+                            @foreach (var exercise in workout.WorkoutBundle.BestSets)
                             {
                                 <p> @exercise.Weight kg x @exercise.Repetitions</p>
                             }
@@ -57,7 +58,96 @@
     {
         <div class="clearfix"></div>
 
-    }   
+    }
 
 
 </div>
+
+
+<div id="workoutModalContainer" class="modal fade" tabindex="-1" role="dialog">
+    <a href="#close" title="Close" class="modal-close-btn">X</a>
+    <div class="modal-content">
+        <div class="modal-body"></div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        $('body').on('click', '.workoutModal', function (e) {
+            e.preventDefault();
+
+            $("#workoutModalContainer").remove();
+
+            $.get($(this).data("targeturl"), function (data) {
+                $('<div id="workoutModalContainer" class="modal fade">  <div class="modal-dialog" >' +
+                    '<div class="modal-content" id= "modalbody" >' +
+                    data +
+                    '</div></div></div>').modal();
+            });
+        });
+       
+        function sendWeights(icon) {
+            let ok = true;
+            let hiddenWorkoutId = $("#hiddenWorkoutId").text();
+            let actualWeight = [];
+            let actualReps = [];
+
+            let timeSpan = $("#timeSpan").val();
+            if (!timeSpan || isNaN(timeSpan) || timeSpan < 0 || timeSpan > 180) {
+                $("#timeSpan").css("border-color", "red");
+                ok = false;
+            }
+            else {
+                $("#timeSpan").css('border-color', "green");
+            }
+
+
+            $(icon).parent().eq(0).parent().eq(0).find('.weights').each(function () {
+                if (!this.value || isNaN(this.value) || this.value < 0 || this.value >500) {
+                    $(this).css("border-color", "red");
+                    ok = false;
+                } else {
+                    $(this).css('border-color',"green");
+                    actualWeight.push(this.value);
+                }
+            });
+
+            $(icon).parent().eq(0).parent().eq(0).find('.reps').each(function () {
+                if (!this.value || isNaN(this.value) || this.value < 0 || this.value >100) {
+                   $(this).css("border-color", "red");
+                    ok = false;
+                } else {
+                    $(this).css('border-color', "green");
+                    actualReps.push(this.value);
+                }
+            });
+
+
+
+            if (ok) {
+                let valdata = {
+                    WorkoutId: hiddenWorkoutId,
+                    TimeSpan: timeSpan,
+                    ActualWeight: actualWeight,
+                    ActualReps: actualReps
+                };
+
+                $.ajax({
+                    url: "/TrainingSplit/ModifyWorkout",
+                    type: "POST",
+                    dataType: 'json',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: valdata,
+                    success: function (response) {
+                        window.location.href = response.redirectToUrl;
+                    }
+
+                });
+            }
+
+        }
+
+ </script>
+}
