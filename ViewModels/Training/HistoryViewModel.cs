@@ -6,6 +6,7 @@ namespace Grit.ViewModels.Training
     public class HistoryViewModel
     {
         public List<WorkoutSplitViewModel> Workouts { get; set; }
+        public string UserId { get; set; }
     }
 
     public class WorkoutSplitViewModel

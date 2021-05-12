@@ -5,11 +5,29 @@
 }
 
 
-<div class="row">
+<div class="calendar-navigation" style="margin-top:35px;">
+    <h2 id="workoutHistoryTitle"> Workout History</h2>
+    <div class="btn-group pull-right">
+        <button class="btn btn-default" data-calendar-nav="prev">&lt;&lt; Prev</button>
+        <button class="btn btn-default active" data-calendar-nav="today">Today</button>
+        <button class="btn btn-default" data-calendar-nav="next">Next &gt;&gt;</button>
+    </div>
+</div>
+
+<div id="calendar" style="margin-top:10px;"></div>
+
+<div class="btn-group pull-right" style="margin-top:20px;">
+    <button class="btn btn-default" data-calendar-view="year">Year</button>
+    <button class="btn btn-default active" data-calendar-view="month">Month</button>
+    <button class="btn btn-default " data-calendar-view="week">Week</button>
+</div>
+
+
+<div class="row" style="margin-top:55px;">
     @foreach (var workout in Model.Workouts)
     {
         <div class="col-lg-4">
-            <div class="card card-default workoutModal" 
+            <div class="card card-default workoutModal"
                  data-targeturl="@Url.Action("HistoryDetails","TrainingSplit",new { id = workout.WorkoutBundle.Workout.Id})">
                 <div class="card-header">@workout.TrainingSplitName</div>
                 <div class="card-body">
@@ -71,10 +89,73 @@
     </div>
 </div>
 
+@Html.HiddenFor(x => x.UserId)
 
 
 @section scripts{
+
+
     <script>
+        const userId = $("#UserId").val();
+        var options = {
+            events_source: "https://localhost:44387/feedCalendarApi/"+userId,
+            view: 'month',
+            tmpl_path: '/Content/calendarTemplate/',
+            first_day: 1,
+            tmpl_cache: false,
+   @*         onAfterEventsLoad: function (events) {
+                if (!events) {
+                    return;
+                }
+                var list = $('#eventlist');
+                list.html('');
+
+                $.each(events, function (key, val) {
+                    $(document.createElement('li'))
+                        .html('<a href="' + val.url + '">' + val.title + '</a>')
+                        .appendTo(list);
+                });
+            },*@
+            onAfterViewLoad: function (view) {
+                $('#workoutHistoryTitle').text(this.getTitle());
+                $('.btn-group button').removeClass('active');
+                $('button[data-calendar-view="' + view + '"]').addClass('active');
+            },
+            classes: {
+                months: {
+                    general: 'label'
+                }
+            }
+        };
+        var calendar = $("#calendar").calendar(options);
+
+        $('.btn-group button[data-calendar-nav]').each(function () {
+
+            $(this).click(function () {
+                removeClassActive();
+                $(this).addClass('active');
+                calendar.navigate($(this).data('calendar-nav'));
+            });
+        });
+
+        $('.btn-group button[data-calendar-view]').each(function () {
+            $(this).click(function () {
+                removeClassActive();
+                $(this).addClass('active');
+                calendar.view($(this).data('calendar-view'));
+            });
+        });
+
+        function removeClassActive() {
+            $('.btn-group button[data-calendar-nav]').each(function () {
+                $(this).removeClass('active');
+            });
+
+            $('.btn-group button[data-calendar-view]').each(function () {
+                $(this).removeClass('active');
+            });
+        };
+
         $('body').on('click', '.workoutModal', function (e) {
             e.preventDefault();
 
@@ -87,7 +168,7 @@
                     '</div></div></div>').modal();
             });
         });
-       
+
         function sendWeights(icon) {
             let ok = true;
             let hiddenWorkoutId = $("#hiddenWorkoutId").text();
@@ -105,18 +186,18 @@
 
 
             $(icon).parent().eq(0).parent().eq(0).find('.weights').each(function () {
-                if (!this.value || isNaN(this.value) || this.value < 0 || this.value >500) {
+                if (!this.value || isNaN(this.value) || this.value < 0 || this.value > 500) {
                     $(this).css("border-color", "red");
                     ok = false;
                 } else {
-                    $(this).css('border-color',"green");
+                    $(this).css('border-color', "green");
                     actualWeight.push(this.value);
                 }
             });
 
             $(icon).parent().eq(0).parent().eq(0).find('.reps').each(function () {
-                if (!this.value || isNaN(this.value) || this.value < 0 || this.value >100) {
-                   $(this).css("border-color", "red");
+                if (!this.value || isNaN(this.value) || this.value < 0 || this.value > 100) {
+                    $(this).css("border-color", "red");
                     ok = false;
                 } else {
                     $(this).css('border-color', "green");
@@ -149,5 +230,5 @@
 
         }
 
- </script>
+    </script>
 }

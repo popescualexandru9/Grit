@@ -3928,6 +3928,7 @@ fieldset[disabled] a.btn {
 }
 
 .btn-default {
+    font-weight:600 ;
     color: #383838;
     background-color: #66fcf1;
     border-color: #66fcf1;
@@ -3949,7 +3950,7 @@ fieldset[disabled] a.btn {
     .btn-default:active,
     .btn-default.active,
     .open > .dropdown-toggle.btn-default {
-        color: #c5c6c7;
+        color: #66fcf1;
         background-color: #0b0c10;
         background-image: none;
         border-color: #0b0c10;
@@ -4009,7 +4010,7 @@ fieldset[disabled] a.btn {
     .btn-primary:active,
     .btn-primary.active,
     .open > .dropdown-toggle.btn-primary {
-        color: #808080;
+        color: #fff;
         background-color: #45A293;
         background-image: none;
         border-color: #45A293;

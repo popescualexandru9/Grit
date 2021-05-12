@@ -264,7 +264,8 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\ExerciseApiController.cs" />
+    <Compile Include="Controllers\Api\ExerciseApiController.cs" />
+    <Compile Include="Controllers\Api\FeedCalendarApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -346,6 +347,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Controllers\TrainingSplitController.cs" />
+    <Compile Include="Models\Training\FeedCalendarApi.cs" />
     <Compile Include="Models\Training\Set.cs" />
     <Compile Include="Models\Training\TrainingSplit.cs" />
     <Compile Include="Models\UserSplit.cs" />
@@ -368,6 +370,7 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\calendar.css" />
     <Content Include="Content\Chart.css" />
     <Content Include="Content\Chart.min.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.css" />
@@ -493,6 +496,7 @@
     <Content Include="Scripts\bootbox.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\calendar.js" />
     <Content Include="Scripts\Chart.js" />
     <Content Include="Scripts\Chart.min.js" />
     <Content Include="Scripts\chartjs-annotation\chartjs-plugin-annotation.js" />
@@ -694,6 +698,16 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
+    <Content Include="Scripts\underscore-min.js" />
+    <Content Include="Content\calendarTemplate\day.html" />
+    <Content Include="Content\calendarTemplate\events-list.html" />
+    <Content Include="Content\calendarTemplate\modal.html" />
+    <Content Include="Content\calendarTemplate\month-day.html" />
+    <Content Include="Content\calendarTemplate\month.html" />
+    <Content Include="Content\calendarTemplate\week-days.html" />
+    <Content Include="Content\calendarTemplate\week.html" />
+    <Content Include="Content\calendarTemplate\year-month.html" />
+    <Content Include="Content\calendarTemplate\year.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -754,6 +768,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\FeedCalendarApi\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

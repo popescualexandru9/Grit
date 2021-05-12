@@ -298,6 +298,7 @@ namespace Grit.Models
 
             var model = new HistoryViewModel
             {
+                UserId = user.Id,
                 Workouts = modelArray
             };
 
