@@ -100,16 +100,19 @@ namespace Grit.Models
                     workout.TimeSpan = model.TimeSpan;
 
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-                    var i = 0;
+                    var setCounter = 0;
+                    var exerciseCounter = 0;
                     foreach (var exercise in exercises)
                     {
                         var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
 
+                        exercise.Name = model.ExerciseNames[exerciseCounter];
+                        exerciseCounter += 1;
                         foreach (var set in sets)
                         {
-                            set.ActualWeight = decimal.Round(model.ActualWeight[i], 2);
-                            set.ActualReps = model.ActualReps[i];
-                            i += 1;
+                            set.ActualWeight = decimal.Round(model.ActualWeight[setCounter], 2);
+                            set.ActualReps = model.ActualReps[setCounter];
+                            setCounter += 1;
                         }
                     }
 
@@ -119,18 +122,21 @@ namespace Grit.Models
                     // Create new workout from the previous one. Only the Date and the weight are different
                     var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id, model.TimeSpan);
                     var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-                    var i = 0;
+                    var setCounter = 0;
+                    var exerciseCounter = 0;
                     foreach (var exercise in exercises)
                     {
-                        var newExercise = new Exercise(exercise.Name, exercise.MuscleGroup, newWorkout.Id);
+                        var newExercise = new Exercise(model.ExerciseNames[exerciseCounter], exercise.MuscleGroup, newWorkout.Id);
+                        exerciseCounter += 1;
+
                         var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
 
                         foreach (var set in sets)
                         {
                             var newSet = new Set(set.RestTime, set.ExpectedWeight, set.Intensity, set.ExpectedRepsFst, set.ExpectedRepsSnd, newExercise.Id);
-                            newSet.ActualWeight = decimal.Round(model.ActualWeight[i], 2);
-                            newSet.ActualReps = model.ActualReps[i];
-                            i += 1;
+                            newSet.ActualWeight = decimal.Round(model.ActualWeight[setCounter], 2);
+                            newSet.ActualReps = model.ActualReps[setCounter];
+                            setCounter += 1;
 
                             newExercise.Sets.Add(newSet);
                         }
@@ -333,24 +339,45 @@ namespace Grit.Models
         {
             var workout = _context.Workouts.FirstOrDefault(x => x.Id == model.WorkoutId);
             workout.TimeSpan = model.TimeSpan;
+            workout.Date = model.WorkoutDate;
 
 
             workout.Exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-            var i = 0;
+            var setCounter = 0;
+            var exerciseCounter = 0;
             foreach (var exercise in workout.Exercises)
             {
                 exercise.Sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
 
+                exercise.Name = model.ExerciseNames[exerciseCounter];
+                exerciseCounter += 1;
+
                 foreach (var set in exercise.Sets)
                 {
-                    set.ActualWeight = model.ActualWeight[i];
-                    set.ActualReps = model.ActualReps[i];
-                    i += 1;
+                    set.ActualWeight = model.ActualWeight[setCounter];
+                    set.ActualReps = model.ActualReps[setCounter];
+                    setCounter += 1;
                 }
             }
 
             _context.SaveChanges();
             return Json(new { redirectToUrl = Url.Action("History", "TrainingSplit") });
+        }
+
+        public ActionResult DeleteWorkoutFromHistory(int id)
+        {
+            var workout = _context.Workouts.FirstOrDefault(x => x.Id == id);
+
+            var numberWorkouts = _context.Workouts.Count(x => x.Name == workout.Name);
+
+            if (numberWorkouts <= 1)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            _context.Workouts.Remove(workout);
+            _context.SaveChanges();
+
+            return RedirectToAction("History");
         }
     }
 }

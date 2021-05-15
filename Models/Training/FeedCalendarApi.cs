@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Grit.Models.Training
 {
@@ -27,6 +26,8 @@ namespace Grit.Models.Training
         public string Start { get; set; }
         [JsonProperty("end")]
         public string End { get; set; }
+        [JsonProperty("date")]
+        public string Date { get; set; }
 
 
     }

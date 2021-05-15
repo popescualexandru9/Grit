@@ -25,7 +25,7 @@ namespace Grit.Models
         public int TrainingSplit_Id { get; set; }
 
         public TrainingSplit TrainingSplit { get; set; }
-        public ICollection<Exercise> Exercises { get; set; }
+        public IList<Exercise> Exercises { get; set; }
 
         public Workout()
         {
