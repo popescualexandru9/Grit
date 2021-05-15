@@ -33,7 +33,7 @@ namespace Grit.ViewModels.Training
     public class WorkoutExerciseList
     {
         public Workout Workout { get; set; }
-        public IEnumerable<BestSet> BestSets { get; set; }
+        public IList<BestSet> BestSets { get; set; }
     }
 
     public class METrange

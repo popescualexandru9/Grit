@@ -1026,84 +1026,20 @@ if(!String.prototype.formatNum) {
 
 	Calendar.prototype._update_modal = function() {
 		var self = this;
+		$('span[data-event-id]', this.context).unbind('click');
 
-		$('a[data-event-id]', this.context).unbind('click');
-
-		if(!self.options.modal) {
-			return;
-		}
-
-		var modal = $(self.options.modal);
-
-		if(!modal.length) {
-			return;
-		}
-
-		var ifrm = null;
-		if(self.options.modal_type == "iframe") {
-			ifrm = $(document.createElement("iframe"))
-				.attr({
-					width: "100%",
-					frameborder: "0"
-				});
-		}
-
-		$('a[data-event-id]', this.context).on('click', function(event) {
+		$('span[data-event-id]', this.context).on('click', function (event) {
 			event.preventDefault();
 			event.stopPropagation();
 
-			var url = $(this).attr('href');
-			var id = $(this).data("event-id");
-			var event = _.find(self.options.events, function(event) {
-				return event.id == id
+			$(".workoutModalContainer").remove();
+
+			$.get($(this).data("targeturl"), function (data) {
+				$('<div class="workoutModalContainer modal fade">  <div class="modal-dialog" >' +
+					'<div class="modal-content" id= "modalbody" >' +
+					data +
+					'</div></div></div>').modal();
 			});
-
-			if(self.options.modal_type == "iframe") {
-				ifrm.attr('src', url);
-				$('.modal-body', modal).html(ifrm);
-			}
-
-			if(!modal.data('handled.bootstrap-calendar') || (modal.data('handled.bootstrap-calendar') && modal.data('handled.event-id') != event.id)) {
-				modal.off('show.bs.modal')
-					.off('shown.bs.modal')
-					.off('hidden.bs.modal')
-					.on('show.bs.modal', function() {
-						var modal_body = $(this).find('.modal-body');
-						switch(self.options.modal_type) {
-							case "iframe" :
-								var height = modal_body.height() - parseInt(modal_body.css('padding-top'), 10) - parseInt(modal_body.css('padding-bottom'), 10);
-								$(this).find('iframe').height(Math.max(height, 50));
-								break;
-
-							case "ajax":
-								$.ajax({
-									url: url, dataType: "html", async: false, success: function(data) {
-										modal_body.html(data);
-									}
-								});
-								break;
-
-							case "template":
-								self._loadTemplate("modal");
-								//	also serve calendar instance to underscore template to be able to access current language strings
-								modal_body.html(self.options.templates["modal"]({"event": event, "calendar": self}))
-								break;
-						}
-
-						//	set the title of the bootstrap modal
-						if(_.isFunction(self.options.modal_title)) {
-							modal.find(".modal-title").html(self.options.modal_title(event));
-						}
-					})
-					.on('shown.bs.modal', function() {
-						self.options.onAfterModalShown.call(self, self.options.events);
-					})
-					.on('hidden.bs.modal', function() {
-						self.options.onAfterModalHidden.call(self, self.options.events);
-					})
-					.data('handled.bootstrap-calendar', true).data('handled.event-id', event.id);
-			}
-			modal.modal('show');
 		});
 	};
 
@@ -1147,8 +1083,8 @@ if(!String.prototype.formatNum) {
 		}
 
 
-		self.context.find('a.event').mouseenter(function() {
-			$('a[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').addClass('day-highlight dh-' + $(this).data('event-class'));
+		self.context.find('span.event').mouseenter(function() {
+			$('span[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').addClass('day-highlight dh-' + $(this).data('event-class'));
 		});
 		self.context.find('a.event').mouseleave(function() {
 			$('div.cal-cell1').removeClass('day-highlight dh-' + $(this).data('event-class'));
@@ -1188,7 +1124,7 @@ if(!String.prototype.formatNum) {
 		;
 
 		var slider = $(document.createElement('div')).attr('id', 'cal-slide-box');
-		slider.hide().click(function(event) {
+		slider.hide().click(function (event) {
 			event.stopPropagation();
 		});
 
@@ -1243,10 +1179,10 @@ if(!String.prototype.formatNum) {
 
 		// Wait 400ms before updating the modal & attach the mouseenter&mouseleave(400ms is the time for the slider to fade out and slide up)
 		setTimeout(function() {
-			$('a.event-item').mouseenter(function() {
-				$('a[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').addClass('day-highlight dh-' + $(this).data('event-class'));
+			$('span.event-item').mouseenter(function() {
+				$('span[data-event-id="' + $(this).data('event-id') + '"]').closest('.cal-cell1').addClass('day-highlight dh-' + $(this).data('event-class'));
 			});
-			$('a.event-item').mouseleave(function() {
+			$('span.event-item').mouseleave(function() {
 				$('div.cal-cell1').removeClass('day-highlight dh-' + $(this).data('event-class'));
 			});
 			self._update_modal();
@@ -1276,3 +1212,6 @@ if(!String.prototype.formatNum) {
 		return new Calendar(params, this);
 	}
 }(jQuery));
+
+
+var Plugins; (function (n) { var t = function () { function n(n) { typeof n == "undefined" && (n = 30); this.space = n } return n }(), i; n.AutosizeInputOptions = t; i = function () { function n(t, i) { var r = this; this._input = $(t); this._options = $.extend({}, n.getDefaultOptions(), i); this._mirror = $('<span style="position:absolute; top:-999px; left:0; white-space:pre;"/>'); $.each(["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "textTransform", "wordSpacing", "textIndent"], function (n, t) { r._mirror[0].style[t] = r._input.css(t) }); $("body").append(this._mirror); this._input.on("keydown keyup input propertychange change", function () { r.update() }); (function () { r.update() })() } return n.prototype.getOptions = function () { return this._options }, n.prototype.update = function () { var n = this._input.val() || "", t; n !== this._mirror.text() && (this._mirror.text(n), t = this._mirror.width() + this._options.space, this._input.width(t)) }, n.getDefaultOptions = function () { return this._defaultOptions }, n.getInstanceKey = function () { return "autosizeInputInstance" }, n._defaultOptions = new t, n }(); n.AutosizeInput = i, function (t) { var i = "autosize-input", r = ["text", "password", "search", "url", "tel", "email", "number"]; t.fn.autosizeInput = function (u) { return this.each(function () { if (this.tagName == "INPUT" && t.inArray(this.type, r) > -1) { var f = t(this); f.data(n.AutosizeInput.getInstanceKey()) || (u == undefined && (u = f.data(i)), f.data(n.AutosizeInput.getInstanceKey(), new n.AutosizeInput(this, u))) } }) }; t(function () { t("input[data-" + i + "]").autosizeInput() }) }(jQuery) })(Plugins || (Plugins = {}))

@@ -720,3 +720,22 @@ overflow-y: scroll;
     margin-top:0px !important;
     display:inline-block;
 }
+
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    background: #66fcf1 !important;
+    color: #000 !important;
+}
+
+
+.changeExerciseName {
+    background-color: transparent;
+    border: none;
+    max-width: none;
+}
+
+.changeExerciseName > input {
+    width: 90px;
+    min-width: 90px;
+    max-width: 250px;
+    transition: width 0.25s;
+}

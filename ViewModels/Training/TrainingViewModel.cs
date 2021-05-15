@@ -1,4 +1,5 @@
 ﻿using Grit.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Grit.ViewModels
@@ -24,6 +25,8 @@ namespace Grit.ViewModels
         public int TimeSpan { get; set; }
         public List<decimal> ActualWeight { get; set; }
         public List<int> ActualReps { get; set; }
+        public DateTime WorkoutDate { get; set; }
+        public List<string> ExerciseNames { get; set; }
     }
 
     public class AddSplitFillViewModel

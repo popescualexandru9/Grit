@@ -13,7 +13,7 @@ html {
 
 body {
     margin: 0;
-    background-image: url("Images/blackbrickwall.jpg");
+    background-image: url("Images/backgroundImage.jpg");
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
