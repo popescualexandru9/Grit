@@ -40,7 +40,7 @@
 
                         <span class="card-icons pull-right" style="margin-top:10px;">
                             <span class="glyphicon glyphicon-calendar"> </span>
-                            @workout.WorkoutBundle.Workout.Date.ToString("dd MMM yyyy")
+                            @workout.WorkoutBundle.Workout.Date.ToString("dd MMM yyy")
                         </span>
                         <br />
                         <span class="card-icons">
@@ -49,23 +49,23 @@
                         </span>
 
                     </div>
-                    <div class="row">
-                        <h4 class="col-xs-6">Exercise </h4>
-                        <h4 class="col-xs-6" style="text-align:right">Best Set </h4>
-                    </div>
 
-                    @for (var i = 0; i < workout.WorkoutBundle.Workout.Exercises.Count(); i++)
-                    {
-                        <div class="card-exercise row" style="margin-top:0px;">
-                            <p class="col-xs-8" id="exerciseName">
-                                @workout.WorkoutBundle.Workout.Exercises[i].Sets.Count() x @workout.WorkoutBundle.Workout.Exercises[i].Name
-                            </p>
-
-                            <p class="col-xs-4 " style="padding-left:0px;text-align:right;">
-                                @workout.WorkoutBundle.BestSets[i].Weight kg x @workout.WorkoutBundle.BestSets[i].Repetitions
-                            </p>
+                    <div class="card-exercise">
+                        <div class="pull-left">
+                            <h4>Exercise </h4>
+                            @foreach (var exercise in workout.WorkoutBundle.Workout.Exercises)
+                            {
+                                <p> @exercise.Sets.Count() x @exercise.Name</p>
+                            }
                         </div>
-                    }
+                        <div class="pull-right">
+                            <h4>Best Set </h4>
+                            @foreach (var exercise in workout.WorkoutBundle.BestSets)
+                            {
+                                <p> @exercise.Weight kg x @exercise.Repetitions</p>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,10 +78,11 @@
 
     }
 
+
 </div>
 
 
-<div class="workoutModalContainer modal fade" tabindex="-1" role="dialog">
+<div id="workoutModalContainer" class="modal fade" tabindex="-1" role="dialog">
     <a href="#close" title="Close" class="modal-close-btn">X</a>
     <div class="modal-content">
         <div class="modal-body"></div>
@@ -95,14 +96,26 @@
 
 
     <script>
-        // Calendar
         const userId = $("#UserId").val();
         var options = {
-            events_source: "https://localhost:44387/feedCalendarApi/" + userId,
+            events_source: "https://localhost:44387/feedCalendarApi/"+userId,
             view: 'month',
             tmpl_path: '/Content/calendarTemplate/',
             first_day: 1,
             tmpl_cache: false,
+   @*         onAfterEventsLoad: function (events) {
+                if (!events) {
+                    return;
+                }
+                var list = $('#eventlist');
+                list.html('');
+
+                $.each(events, function (key, val) {
+                    $(document.createElement('li'))
+                        .html('<a href="' + val.url + '">' + val.title + '</a>')
+                        .appendTo(list);
+                });
+            },*@
             onAfterViewLoad: function (view) {
                 $('#workoutHistoryTitle').text(this.getTitle());
                 $('.btn-group button').removeClass('active');
@@ -143,37 +156,24 @@
             });
         };
 
+        $('body').on('click', '.workoutModal', function (e) {
+            e.preventDefault();
 
-        function launchModal() {
-            $(".workoutModalContainer").remove();
+            $("#workoutModalContainer").remove();
 
             $.get($(this).data("targeturl"), function (data) {
-                $('<div class="workoutModalContainer modal fade">  <div class="modal-dialog" >' +
+                $('<div id="workoutModalContainer" class="modal fade">  <div class="modal-dialog" >' +
                     '<div class="modal-content" id= "modalbody" >' +
                     data +
                     '</div></div></div>').modal();
             });
-        }
+        });
 
-        $('.workoutModal').click(launchModal);
-
-        // Save data
         function sendWeights(icon) {
             let ok = true;
             let hiddenWorkoutId = $("#hiddenWorkoutId").text();
             let actualWeight = [];
             let actualReps = [];
-            let exerciseNames = [];
-
-
-            let workoutDate = $("#workoutDate").val();
-            if (!workoutDate || moment(workoutDate, 'ddd, DD MMM YYYY', true).isValid() == false) {
-                $("#workoutDate").css("border-color", "red");
-                ok = false;
-            }
-            else {
-                $("#workoutDate").css('border-color', "green");
-            }
 
             let timeSpan = $("#timeSpan").val();
             if (!timeSpan || isNaN(timeSpan) || timeSpan < 0 || timeSpan > 180) {
@@ -205,16 +205,6 @@
                 }
             });
 
-            $(icon).parent().eq(0).parent().eq(0).find('.changeExerciseName').each(function () {
-                if (!this.value) {
-                    $(this).css("border-color", "red");
-                    ok = false;
-                } else {
-                    $(this).css('border-color', "green");
-                    exerciseNames.push(this.value);
-                }
-            });
-
 
 
             if (ok) {
@@ -222,9 +212,7 @@
                     WorkoutId: hiddenWorkoutId,
                     TimeSpan: timeSpan,
                     ActualWeight: actualWeight,
-                    ActualReps: actualReps,
-                    WorkoutDate: workoutDate,
-                    ExerciseNames: exerciseNames
+                    ActualReps: actualReps
                 };
 
                 $.ajax({
@@ -243,8 +231,4 @@
         }
 
     </script>
-}
-
-@section Quote{
-    Make shit happen.
 }

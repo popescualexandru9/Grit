@@ -8,14 +8,14 @@ namespace Grit.Models
         public int Id { get; set; }
 
         [Required]
-        [Range(1, 100)]
+        [Range(1, 30)]
         public int ExpectedRepsFst { get; set; }
 
         [Required]
-        [Range(1, 100)]
+        [Range(1, 30)]
         public int ExpectedRepsSnd { get; set; }
 
-        [Range(1, 100)]
+        [Range(1, 30)]
         public int? ActualReps { get; set; }
 
         [Required]

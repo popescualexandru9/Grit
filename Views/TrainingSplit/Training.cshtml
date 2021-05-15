@@ -1,7 +1,7 @@
 ﻿@model  Grit.ViewModels.TrainingViewModel
 @{
     ViewBag.Title = "Training Plan";
-    SelectList RepsList = new SelectList(Enumerable.Range(1, 100));
+    SelectList RepsList = new SelectList(Enumerable.Range(1, 30));
 
 }
 
@@ -194,15 +194,7 @@
 
                                         <td rowspan="@workout.Exercises[i].Sets.Count" class="trainingTableExerciseName">
                                             <span style="position:relative;">
-                                                @Html.TextBox("exerciseName", workout.Exercises[i].Name, new
-                                               {
-
-                                                   @class = "changeExerciseName",
-                                                   style = "text-align:center",
-                                                   onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
-                                                   onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#66fcf1' });",
-                                               })
-                                                <span class="tooltiptext">
+                                                @workout.Exercises[i].Name <span class="tooltiptext">
                                                     @workout.Exercises[i].MuscleGroup
                                                 </span>
                                             </span>
@@ -272,7 +264,6 @@
     <script src="@Url.Content("~/Scripts/scripts/timer.js")"></script>
     <script>
         $(document).ready(function () {
-            $(".changeExerciseName").autosizeInput();
             // Workouts list hover efect
             $(".panelBody").hover(function () {
                 $(this).stop().animate({
@@ -541,13 +532,7 @@
             let hiddenWorkoutId = $(icon).parent().eq(0).find(".hiddenWorkoutId").text();
             let actualWeight = [];
             let actualReps = [];
-            let exerciseNames = []; 
-
             $(icon).parent().eq(0).next().eq(0).find('input').each(function () {
-                if ($(this).hasClass('changeExerciseName')) {
-                    return;
-                }
-
                 if (!this.value || isNaN(this.value) || this.value < 0) {
                     $(this).parent().eq(0).removeClass('has-success has-error').addClass('has-error');
                     ok = false;
@@ -561,17 +546,6 @@
                 }
             });
 
-            $(icon).parent().eq(0).parent().eq(0).find('.changeExerciseName').each(function () {
-                if (!this.value) {
-                    $(this).css({ 'border': '1px solid red', 'border-radius': '3px' });
-                    ok = false;
-                } else {
-                    $(this).css("border", "none");
-                    exerciseNames.push(this.value);
-                }
-            });
-
-
             // Stop workout timer
             clearInterval(timerInterval);
             isTimeRunning = false;
@@ -581,8 +555,7 @@
                     WorkoutId: hiddenWorkoutId,
                     TimeSpan: Math.round(window["timeElapsed" + hiddenWorkoutId] / 60),
                     ActualWeight: actualWeight,
-                    ActualReps: actualReps,
-                    ExerciseNames: exerciseNames
+                    ActualReps: actualReps
                 };
 
                 $.ajax({

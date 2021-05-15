@@ -35,27 +35,20 @@ namespace Grit.Controllers
             var i = 0;
             foreach (var workout in workouts)
             {
-                var sets = _context.Exercises.Where(x => x.Workout_Id == workout.Id)
-                                             .Join(_context.Sets, wrkout => wrkout.Id, set => set.Exercise_Id,
-                                             (wrkout, set) => new { weight = set.ActualWeight, rep = set.ActualReps }).ToList().All(x => x.rep == null && x.weight == null);
-                // Eliminate first (default) workouts
-                if (sets)
-                    continue;
-
                 var trainingSplitName = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id).Name;
 
                 // Convert DateTime to miliseconds
                 var start = workout.Date.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
                 var end = start + TimeSpan.FromMinutes(Convert.ToDouble(workout.TimeSpan)).TotalMilliseconds;
+
                 history.Add(new DayCalendar
                 {
                     Id = i,
-                    Name = workout.Name,
-                    Url = "/TrainingSplit/HistoryDetails/" + workout.Id,
+                    Name = trainingSplitName + " " + workout.Name,
+                    Url = "",
                     Kind = "",
                     Start = start.ToString(),
-                    End = end.ToString(),
-                    Date = workout.Date.ToString("dddd, dd MMM yyyy")
+                    End = end.ToString()
                 });
                 i += 1;
             }

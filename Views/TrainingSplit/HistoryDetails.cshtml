@@ -14,12 +14,12 @@
             <p style="position:absolute; display:none" id="hiddenWorkoutId">@Model.WorkoutBundle.Workout.Id</p>
             <p class="card-icons">
                 <span class="glyphicon glyphicon-calendar"> </span>
-                @Html.TextBoxFor(x => x.WorkoutBundle.Workout.Date, "{0:ddd, dd MMM yyyy}", new { @class = "inputHistory datepicker", autocomplete = "off", style = " text-align: center;", id = "workoutDate" })
+                @Model.WorkoutBundle.Workout.Date.ToString("dddd, dd MMM yyyy")
             </p>
 
 
             <span class="card-icons">
-                <span class="glyphicon glyphicon-time" > </span>
+                <span class="glyphicon glyphicon-time"> </span>
                 <input class="inputHistory" id="timeSpan" value="@Model.WorkoutBundle.Workout.TimeSpan" type="number" min="0" max="180" dir="rtl" /> min
             </span>
 
@@ -35,14 +35,7 @@
         {
             <div>
                 <h4>
-                    @Html.TextBox("exerciseName", exercise.Name, new
-                   {
-
-                       @class = "changeExerciseName",
-                       onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
-                       onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
-                   })
-               
+                    @exercise.Name
                     <span class="pull-right onerm">
                         <strong style="color: #66fcf1;"> ~ </strong> 1 RM
                         <span class="tooltiptext"> Estimated One-Rep Maximum </span>
@@ -75,30 +68,6 @@
 
     </div>
     <div class="modal-footer">
-        @Html.ActionLink("Delete", "DeleteWorkoutFromHistory", "TrainingSplit",new { id= Model.WorkoutBundle.Workout.Id }, new { @class = "btn btn-danger pull-left" })
         <button type="button" class="btn btn-primary" onclick="sendWeights(this)">Save</button>
     </div>
 </div>
-
-<script>
-
-    // I'm using this so that the datepicker can work inside the modal
-    $(function () {
-        $("body").delegate(".datepicker", "focusin", function () {
-            $(this).datepicker();
-        });
-    });
-
-    $(document).ready(function () {
-        $(".changeExerciseName").autosizeInput();
-        $(function () {
-            $('.datepicker').datepicker({
-                dateFormat: 'D, dd MM yy',
-                changeMonth: true,
-                changeYear: true,
-                firstDay: 1,
-                showAnim: "fold"
-            });
-        });
-    });
-</script>

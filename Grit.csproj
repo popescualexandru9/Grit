@@ -486,7 +486,6 @@
     <Content Include="Content\Images\6.jpg" />
     <Content Include="Content\Images\blackbrickwall.jpg" />
     <Content Include="Content\Images\slate-texture-background.jpg" />
-    <Content Include="Content\Images\tick.png" />
     <Content Include="Content\old.css" />
     <Content Include="Content\Images\backgroundImage.jpg" />
     <Content Include="favicon.ico" />
