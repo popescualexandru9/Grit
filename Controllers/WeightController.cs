@@ -53,7 +53,7 @@ namespace Grit.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Progress", "Weight", new { status = "bad" });
+                return RedirectToAction("Progress", "Weight", new { status = Resources.WeightInvalid });
             }
 
             // Basically UserManager.FindById(User,Identity.GetUserId())
@@ -75,7 +75,7 @@ namespace Grit.Controllers
                 user.DailyWeight_Id = Create(weight, user.Id, model.TodaysWeight.Date);
                 HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().Update(user);
             }
-              _context.SaveChanges();
+            _context.SaveChanges();
             return RedirectToAction("Progress", "Weight");
         }
 
@@ -87,7 +87,7 @@ namespace Grit.Controllers
             var rgx = rx.IsMatch(weightInput);
             if (!rgx)
             {
-                return RedirectToAction("Progress", "Weight", new { status = "bad" });
+                return RedirectToAction("Progress", "Weight", new { status = Resources.WeightInvalid });
             }
 
             decimal d = decimal.Parse(weightInput);
@@ -112,11 +112,11 @@ namespace Grit.Controllers
             var weightEntry = _context.Weights.SingleOrDefault(x => x.UserId == user.Id && DateTime.Compare(DbFunctions.TruncateTime(x.Date) ?? DateTime.Now,
                                                                                                 dateInput.Date) == 0);
 
-            if(weightEntry == null)
+            if (weightEntry == null)
             {
                 return Json(new { redirectToUrl = Url.Action("Progress", "Weight") });
             }
-            if(user.DailyWeight_Id == weightEntry.Id) // Avoid EF conflict when deleting foreign key by removing the foreign key first.
+            if (user.DailyWeight_Id == weightEntry.Id) // Avoid EF conflict when deleting foreign key by removing the foreign key first.
             {
                 user.DailyWeight = null;
                 user.DailyWeight_Id = null;

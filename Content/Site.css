@@ -739,3 +739,52 @@ overflow-y: scroll;
     max-width: 250px;
     transition: width 0.25s;
 }
+
+.formfield * {
+    vertical-align: middle;
+}
+
+.exerciseLibrary > dt {
+    width: 90px !important;
+}
+.exerciseLibrary > dd{
+    margin-left: 100px !important;
+}
+
+.exerciseList {
+    max-width:720px; 
+    margin-left:20%; 
+    margin-top:38px;
+}
+
+.muscleGroupsCheckboxButton{
+    display:none;
+}
+.muscleGroupsCheckbox > h4 {
+    text-align: center;
+    font-weight: 700;
+}
+
+ @media screen and (max-width : 992px) {
+    .checkBoxHide {
+        display: none !important;
+    }   
+    .muscleGroupsCheckbox {
+        width:102%;
+        margin-left: -32px;
+    }
+    .muscleGroupsCheckbox > h4 {
+        text-align:left;
+        margin-left:32px;
+    }
+    .muscleGroupsCheckboxButton {
+        display: block !important;
+    }
+    .exerciseList {
+        margin-left: 0% !important;
+    }
+}
+
+
+
+

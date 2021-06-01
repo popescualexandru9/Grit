@@ -19,7 +19,7 @@ namespace Grit.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private WeightController weightController;
 
         #region providedRegion
@@ -96,7 +96,7 @@ namespace Grit.Controllers
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, model.RememberMe });
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
@@ -183,7 +183,7 @@ namespace Grit.Controllers
                     int index = addr.Host.LastIndexOf(".");
                     string emailHost = addr.Host.Substring(0, index);
 
-                    return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser, emailHost = emailHost });
+                    return RedirectToAction("FillInfo", "Account", new { emailUser, emailHost });
                 }
                 AddErrors(result);
             }
@@ -334,7 +334,7 @@ namespace Grit.Controllers
             {
                 return View("Error");
             }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, model.ReturnUrl, model.RememberMe });
         }
 
         //
@@ -400,7 +400,7 @@ namespace Grit.Controllers
                         int index = addr.Host.LastIndexOf(".");
                         string emailHost = addr.Host.Substring(0, index);
 
-                        return RedirectToAction("FillInfo", "Account", new { emailUser = emailUser, emailHost = emailHost });
+                        return RedirectToAction("FillInfo", "Account", new { emailUser, emailHost });
                     }
                 }
                 AddErrors(result);
@@ -534,7 +534,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by email.");
+                throw new HttpException(404, Resources.NoUserByEmail);
             }
 
             // Format weight and height to always have 2 decimals
@@ -576,7 +576,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by id.");
+                throw new HttpException(404, Resources.NoUserById);
             }
 
             _context.Users.Attach(user);
@@ -588,14 +588,14 @@ namespace Grit.Controllers
         }
 
         [Authorize(Roles = "Employee, Admin")]
-        public ActionResult MemberDetails(string id, string status)
+        public ActionResult MemberDetails(string id)
         {
             var user = _context.Users.SingleOrDefault(x => x.Id.Equals(id));
 
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by id.");
+                throw new HttpException(404, Resources.NoUserById);
             }
 
             var activeSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == user.ActiveWorkout_Id);
@@ -632,7 +632,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by email.");
+                throw new HttpException(404, Resources.NoUserByEmail);
             }
 
 
@@ -678,7 +678,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by id.");
+                throw new HttpException(404, Resources.NoUserById);
             }
 
             var detailsModel = new MemberDetailsViewModel
@@ -717,10 +717,10 @@ namespace Grit.Controllers
 
 
             UserManager.Update(user);
-            if (AddSplits)
-            {
-                AddSplitsToUser(user);
-            }
+            /* if (AddSplits)
+             {
+                 AddSplitsToUser(user);
+             }*/
 
         }
         #endregion

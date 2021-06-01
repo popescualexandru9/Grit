@@ -415,7 +415,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by id.");
+                throw new HttpException(404, Resources.NoUserById);
             }
 
             var detailsModel = new MemberDetailsViewModel
@@ -440,7 +440,7 @@ namespace Grit.Controllers
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                throw new HttpException(404, "Can't find user by email.");
+                throw new HttpException(404, Resources.NoUserByEmail);
             }
 
             if (!user.UserName.Equals(model.User.UserName))

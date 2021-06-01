@@ -1,7 +1,7 @@
 ﻿@model  Grit.ViewModels.Training.HistoryViewModel
 @{
     ViewBag.Title = "Workout History";
-    var cntClearfix = 1;
+    var cntClearfix = 0;
 }
 
 
@@ -61,22 +61,32 @@
                                 @workout.WorkoutBundle.Workout.Exercises[i].Sets.Count() x @workout.WorkoutBundle.Workout.Exercises[i].Name
                             </p>
 
-                            <p class="col-xs-4 " style="padding-left:0px;text-align:right;">
-                                @workout.WorkoutBundle.BestSets[i].Weight kg x @workout.WorkoutBundle.BestSets[i].Repetitions
-                            </p>
+                            @if (@workout.WorkoutBundle.BestSets[i].Weight > 0)
+                            {
+                                <p class="col-xs-4 " style="padding-left:0px;text-align:right;">
+                                    @workout.WorkoutBundle.BestSets[i].Weight kg x @workout.WorkoutBundle.BestSets[i].Repetitions
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="col-xs-4 " style="padding-left:0px;text-align:right;">
+                                    @workout.WorkoutBundle.BestSets[i].Repetitions reps
+                                </p>
+                            }
+
                         </div>
                     }
                 </div>
             </div>
         </div>
         cntClearfix++;
+        if (cntClearfix % 3 == 0)
+        {
+            <div class="clearfix"></div>
+
+        }
     }
 
-    @if (cntClearfix % 3 == 0)
-    {
-        <div class="clearfix"></div>
-
-    }
 
 </div>
 

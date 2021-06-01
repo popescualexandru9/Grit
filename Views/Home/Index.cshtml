@@ -21,16 +21,19 @@
         <p>@Html.ActionLink("Start now »", "Training", "TrainingSplit", routeValues: null, htmlAttributes: new { @class = "btn btn-primary" })</p>
     </div>
     <div class="col-md-4">
-        <h2>Time your workouts</h2>
-        <p>Use this feature to monitor how much time you rest between sets.</p>
-        <p>@Html.ActionLink("Countdown timer »", "Timer", "Home", htmlAttributes: new { @class = "btn btn-primary" })</p>
-    </div>
-    <div class="col-md-4">
         <h2>Track your progress</h2>
-        <p>You can easily track your bodyweight every day and keep and eye on its fluctuations. <br />
-        The app will calculate the average of your last 7 entries.</p>
+        <p>
+            You can easily track your bodyweight every day and keep and eye on its fluctuations. <br />
+            The app will calculate the average of your last 7 entries.
+        </p>
         <p>@Html.ActionLink("Add weight »", "Progress", "Weight", routeValues: null, htmlAttributes: new { @class = "btn btn-primary" })</p>
     </div>
+    <div class="col-md-4">
+        <h2>Learn more</h2>
+        <p>Learn more about this application.</p>
+        <p>@Html.ActionLink("About »", "About", "Home", htmlAttributes: new { @class = "btn btn-primary" })</p>
+    </div>
+
 </div>
 
 @section Quote{

@@ -6,13 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-
 namespace Grit.Models
 {
     [Authorize]
     public class TrainingSplitController : Controller
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private static readonly double METlow = 3.5; // Metabolic equivalent of task for weight lifting low intensity
         private static readonly double METhigh = 6; // Metabolic equivalent of task for weight lifting high intensity
 
@@ -37,26 +36,74 @@ namespace Grit.Models
                 var workouts = _context.Workouts.Where(x => x.TrainingSplit_Id == activeSplit.Id).GroupBy(x => x.Name)
                                                   .Select(x => x.OrderByDescending(w => w.Date).FirstOrDefault()).ToList();
 
+
                 var workoutDays = new List<WorkoutDay>();
 
                 foreach (Workout workout in workouts)
                 {
-                    var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-                    foreach (var exercise in exercises)
-                    {
-                        exercise.Sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
-                    }
+                    var priorWorkout = _context.Workouts.Where(x => x.Name == workout.Name && x.Date < workout.Date).OrderByDescending(x => x.Date).FirstOrDefault();
 
+                    var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+                    var priorWorkoutExercises = priorWorkout != null ? _context.Exercises.Where(x => x.Workout_Id == priorWorkout.Id).ToList() : null;
+
+                    for (var exerciseCounter = 0; exerciseCounter < exercises.Count(); exerciseCounter++)
+                    {
+                        var exerciseId = exercises[exerciseCounter].Id;
+                        exercises[exerciseCounter].Sets = _context.Sets.Where(x => x.Exercise_Id == exerciseId).ToList();
+                        var sets = Extensions.Clone<Set>(exercises[exerciseCounter].Sets);
+
+                        if (priorWorkout != null)
+                        {
+                            var priorWorkoutExerciseId = priorWorkoutExercises[exerciseCounter].Id;
+                            var priorWorkoutSets = priorWorkout != null ? _context.Sets.Where(x => x.Exercise_Id == priorWorkoutExerciseId).ToList() : null;
+
+                            var allSetsTargetWeightandRepsHit = true;
+
+                            for (var setCounter = 0; setCounter < sets.Count(); setCounter++)
+                            {
+
+                                if (!sets[setCounter].Intensity.Equals(Intensity.WarmUp) && !sets[setCounter].ExpectedWeight.Equals(ExpectedWeight.Light) &&
+                                      !sets[setCounter].Intensity.Equals(Intensity.Moderate) && !sets[setCounter].ExpectedWeight.Equals(ExpectedWeight.Moderate))
+                                {
+
+                                    var actualWeight = sets[setCounter].ActualWeight;
+                                    var actualReps = sets[setCounter].ActualReps;
+
+                                    var priorWorkoutWeight = priorWorkoutSets[setCounter].ActualWeight;
+                                    var priorWorkoutReps = priorWorkoutSets[setCounter].ActualReps;
+
+
+                                    var (newWeigth, newReps, setTargetWeightAndRepsHit) = AdjustProgressiveOverload(sets[setCounter].ActualWeight, priorWorkoutSets[setCounter].ActualWeight,
+                                                                                                                    sets[setCounter].ActualReps, priorWorkoutSets[setCounter].ActualReps,
+                                                                                                                    sets[setCounter].ExpectedRepsFst, sets[setCounter].ExpectedRepsSnd);
+
+
+                                    sets[setCounter].ActualWeight = newWeigth;
+                                    sets[setCounter].ActualReps = newReps;
+
+                                    if (setTargetWeightAndRepsHit == false)
+                                    {
+                                        exercises[exerciseCounter].Sets[setCounter] = sets[setCounter];
+                                        allSetsTargetWeightandRepsHit = false;
+                                    }
+                                }
+                            }
+
+                            if (allSetsTargetWeightandRepsHit)
+                            {
+                                exercises[exerciseCounter].Sets = sets;
+                            }
+                        }
+
+                    }
                     var workoutDay = new WorkoutDay
                     {
                         Workout = workout,
                         Exercises = exercises
-
                     };
 
                     workoutDays.Add(workoutDay);
                 }
-
                 var model = new TrainingViewModel
                 {
                     Splits = _context.UserSplits.Where(x => x.UserID == user.Id).Select(x => x.Split).ToList(),
@@ -64,6 +111,7 @@ namespace Grit.Models
                     WorkoutDays = workoutDays
                 };
 
+                // TODO return message to be displayed when a user has made progress
                 return View(model);
             }
             else
@@ -93,63 +141,53 @@ namespace Grit.Models
             else
             {
                 var workout = _context.Workouts.FirstOrDefault(x => x.Id == model.WorkoutId);
-                // If the workout happened today, modify this one. Else create a copy of that workout for todays date
 
-                if (workout.Date.Date == DateTime.Now.Date)
+                var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id, model.TimeSpan);
+                var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
+                var exerciseCounter = 0;
+                var setCounter = 0;
+
+                foreach (var excercise in exercises)
                 {
-                    workout.TimeSpan = model.TimeSpan;
+                    var newExercise = new Exercise(model.ExerciseNames[exerciseCounter], excercise.MuscleGroup, newWorkout.Id);
+                    var sets = _context.Sets.Where(x => x.Exercise_Id == excercise.Id).ToList();
+                    exerciseCounter += 1;
 
-                    var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-                    var setCounter = 0;
-                    var exerciseCounter = 0;
-                    foreach (var exercise in exercises)
+                    foreach (var set in sets)
                     {
-                        var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
-
-                        exercise.Name = model.ExerciseNames[exerciseCounter];
-                        exerciseCounter += 1;
-                        foreach (var set in sets)
+                        var newSet = new Set(set.RestTime, set.ExpectedWeight, set.Intensity, set.ExpectedRepsFst, set.ExpectedRepsSnd, newExercise.Id)
                         {
-                            set.ActualWeight = decimal.Round(model.ActualWeight[setCounter], 2);
-                            set.ActualReps = model.ActualReps[setCounter];
-                            setCounter += 1;
-                        }
+                            ActualWeight = decimal.Round(model.ActualWeight[setCounter], 2),
+                            ActualReps = model.ActualReps[setCounter]
+                        };
+                        setCounter += 1;
+
+                        newExercise.Sets.Add(newSet);
                     }
 
+                    newWorkout.Exercises.Add(newExercise);
                 }
-                else
-                {
-                    // Create new workout from the previous one. Only the Date and the weight are different
-                    var newWorkout = new Workout(workout.Name, workout.TrainingSplit_Id, model.TimeSpan);
-                    var exercises = _context.Exercises.Where(x => x.Workout_Id == workout.Id).ToList();
-                    var setCounter = 0;
-                    var exerciseCounter = 0;
-                    foreach (var exercise in exercises)
-                    {
-                        var newExercise = new Exercise(model.ExerciseNames[exerciseCounter], exercise.MuscleGroup, newWorkout.Id);
-                        exerciseCounter += 1;
 
-                        var sets = _context.Sets.Where(x => x.Exercise_Id == exercise.Id).ToList();
+                var trainingSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id);
+                trainingSplit.Workouts.Add(newWorkout);
 
-                        foreach (var set in sets)
-                        {
-                            var newSet = new Set(set.RestTime, set.ExpectedWeight, set.Intensity, set.ExpectedRepsFst, set.ExpectedRepsSnd, newExercise.Id);
-                            newSet.ActualWeight = decimal.Round(model.ActualWeight[setCounter], 2);
-                            newSet.ActualReps = model.ActualReps[setCounter];
-                            setCounter += 1;
-
-                            newExercise.Sets.Add(newSet);
-                        }
-
-                        newWorkout.Exercises.Add(newExercise);
-                    }
-
-                    var trainingSplit = _context.TrainingSplits.FirstOrDefault(x => x.Id == workout.TrainingSplit_Id);
-                    trainingSplit.Workouts.Add(newWorkout);
-
-
-                }
                 _context.SaveChanges();
+
+
+                //  Create message
+                /*   var message = "";
+                   var priorWorkout = _context.Workouts.Where(x => x.Name == workout.Name && x.Date < workout.Date).OrderByDescending(x => x.Date).FirstOrDefault();
+                   if(priorWorkout != null)
+                   {
+                       var priorWorkoutExercises = _context.Exercises.Where(x => x.Workout_Id == priorWorkout.Id).ToList() : null;
+                   }
+                   else
+                   {
+                       message = Resources.TrainingFirstWorkout;
+                   }
+
+                */
+
                 return Json(new { redirectToUrl = Url.Action("History", "TrainingSplit") });
             }
         }
@@ -169,6 +207,13 @@ namespace Grit.Models
                     var newExercise = new Exercise(exerciseModel.Name, exerciseModel.MuscleGroup, newWorkout.Id);
                     foreach (var setModel in exerciseModel.Sets)
                     {
+                        if (setModel.ExpectedReps.fst > setModel.ExpectedReps.snd)
+                        {
+                            var aux = setModel.ExpectedReps.fst;
+                            setModel.ExpectedReps.fst = setModel.ExpectedReps.snd;
+                            setModel.ExpectedReps.snd = aux;
+                        }
+
                         var newSet = new Set(setModel.RestTime, setModel.ExpectedWeight, setModel.Intensity, setModel.ExpectedReps.fst, setModel.ExpectedReps.snd, newExercise.Id);
 
                         newExercise.Sets.Add(newSet);
@@ -272,13 +317,12 @@ namespace Grit.Models
                     var exercisesVolume = exercise.Sets.Select(x =>
                         new
                         {
-                            volume = x.ActualWeight * x.ActualReps,
+                            ORM = Convert.ToDouble(x.ActualWeight) * (1 + Convert.ToDouble(x.ActualReps) / 30),
                             weight = x.ActualWeight,
                             reps = x.ActualReps
                         });
 
-
-                    bestSets.Add(exercisesVolume.MaxBy(x => x.volume).Select(x =>
+                    bestSets.Add(exercisesVolume.MaxBy(x => x.ORM).Select(x =>
                                   new BestSet { Weight = x.weight, Repetitions = x.reps }).First());
 
 
@@ -378,6 +422,72 @@ namespace Grit.Models
             _context.SaveChanges();
 
             return RedirectToAction("History");
+        }
+
+        private (decimal?, int?, bool) AdjustProgressiveOverload(decimal? actualWeight, decimal? priorWorkoutWeight, int? actualReps,
+                                                          int? priorWorkoutReps, int expectedRepsFst, int expectedRepsSnd)
+        {
+            decimal? newWeight = actualWeight;
+            int? newReps = actualReps;
+            bool allSetsTargetWeightandRepsHit = false;
+
+            if (actualWeight <= priorWorkoutWeight)
+            {
+                if (actualReps < priorWorkoutReps)
+                {
+                    //  Keep working, try to do one more rep
+                    newWeight = actualWeight;
+                    newReps = actualReps + 1;
+                }
+                else if (actualReps >= priorWorkoutReps)
+                {
+                    if (actualReps < expectedRepsSnd)
+                    {
+                        //  Keep working, try to do one more rep
+                        newWeight = actualWeight;
+                        newReps = actualReps + 1;
+                    }
+                    else
+                    {
+                        if (actualWeight == priorWorkoutWeight)
+                        {
+                            allSetsTargetWeightandRepsHit = true;
+                        }
+
+                        // Keep working, increase the weight
+                        newWeight = actualWeight + 2.5M;
+                        newReps = expectedRepsFst;
+                    }
+                }
+            }
+            else
+            {
+                allSetsTargetWeightandRepsHit = true;
+                if (actualReps < expectedRepsSnd)
+                {
+                    // You're a beast, try to do one more rep
+                    newWeight = actualWeight;
+                    newReps = actualReps + 1;
+                }
+                else if (actualReps >= expectedRepsSnd)
+                {
+                    // You're a beast, increase the weight once again
+                    newWeight = actualWeight + 2.5M;
+                    newReps = expectedRepsFst;
+                }
+            }
+
+            return (newWeight, newReps, allSetsTargetWeightandRepsHit);
+        }
+
+
+
+    }
+    static class Extensions
+    {
+        public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable
+        {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
         }
     }
 }

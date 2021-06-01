@@ -1,0 +1,187 @@
+﻿@model IList<Grit.Models.ExerciseLibrary>
+@{
+    ViewBag.Title = "Exercise Library";
+    string[] muscleGroups = { "Chest", "Back", "Arms", "Shoulders", "Legs", "Abs", "Calves" };
+}
+
+<div>
+    <h3>Exercise Library</h3>
+    <h5> Here you can learn how to properly perform the exercises so you don't get injured. Remember that proper form is key!</h5>
+    Reference for all of the demos :
+    Jeff Nippard, (n.d.). <i>Home</i> [YouTube channel]. YouTube. Retrieved June 5, 2021, from <a href="https://www.youtube.com/channel/UC68TLK0mAEzUyHx5x5k-S1Q"> https://www.youtube.com/channel/UC68TLK0mAEzUyHx5x5k-S1Q </a>
+
+</div>
+<br />
+<hr />
+
+
+<div class="muscleGroupsCheckboxButton" >
+    <button class="btn-default btn" id="checkboxBtn"> Filter Exercises</button>
+</div>
+
+
+
+<div class="pull-left checkbox muscleGroupsCheckbox checkBoxHide">
+    <h4 >Muscles</h4>
+    <ul style="list-style-type:none">
+        @foreach (var muscle in muscleGroups)
+        {
+        <li style="font-size:19px; color:#eee">
+            @if (Model.Any(x => x.MuscleGroup == muscle))
+            {
+                <label><input type="checkbox" value="@muscle" checked onclick="filterExercises();">@muscle</label>
+                continue;
+            }
+
+            <label><input type="checkbox" value="@muscle" onclick="filterExercises();">@muscle</label>
+        </li>
+        }
+    </ul>
+</div>
+
+
+<div class="exerciseList">
+
+    @foreach (var exercise in Model)
+    {
+        <div style="margin-bottom:25px;">
+            <div class="" onclick="collapseTable(this, event);">
+                <h4 style="cursor: pointer;">
+                    @exercise.Name
+                    <span class="glyphicon glyphicon-menu-right arrow " style="color:#66fcf1"> </span>
+                </h4>
+
+            </div>
+
+            <div class="collapse">
+                <iframe width="720" height="480" src="@exercise.Url" title="@exercise.Name" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <br />
+                <br />
+
+                <div style="padding-left:10px;">
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Employee"))
+                    {
+
+                        using (Html.BeginForm("ModifyExercise", "ExerciseLibrary", new { }, FormMethod.Post,
+                                                            new { @class = "form-horizontal", role = "form" }))
+                        {
+                            @Html.HiddenFor(x => exercise.Id);
+                            <div class="row">
+                                <div class=" col-xs-6">
+                                    @Html.LabelFor(x => exercise.Url)
+                                    <br />
+                                    @Html.TextAreaFor(x => exercise.Url, new
+                                {
+                                    style = "width:100%; background-color: transparent; color: #fff",
+                                    onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                                    onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                                    onchange = "$(this).parents().submit(); "
+                                })
+                                    @Html.ValidationMessageFor(x => exercise.Url, "", new { @class = "text-danger" })
+                                </div>
+                                <div class=" col-xs-6 col-xs-push-1">
+                                    @Html.LabelFor(x => exercise.Description)
+                                    <br />
+                                    @Html.TextAreaFor(x => exercise.Description, new
+                                {
+                                    style = "width:100%; background-color: transparent; color: #fff",
+                                    onclick = "$(this).css({ 'background-color': '#fff', 'color': '#555' });",
+                                    onblur = "$(this).css({ 'background-color': 'transparent', 'color': '#fff' });",
+                                    onchange = "$(this).parents().submit(); "
+                                })
+                                    @Html.ValidationMessageFor(x => exercise.Description, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                        }
+                    }
+                    else
+                    {
+                        <dl class="dl-horizontal exerciseLibrary">
+                            <dt> Muscle :</dt>
+                            <dd> @exercise.MuscleGroup</dd>
+
+                            <dt> Description :</dt>
+                            <dd> @exercise.Description</dd>
+                        </dl>
+                    }
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+    }
+
+    @if (User.IsInRole("Admin"))
+    {
+        // TODO functionality
+        <div >
+            <button class="btn-default btn" type="submit"> Add Exercise </button>
+        </div>
+    }
+
+</div>
+
+
+
+
+
+@section scripts{
+    <script>
+        function collapseTable(panelHeading, e) {
+
+            let toggler = $(panelHeading).next().eq(0);
+            let title = $(panelHeading).clone()    //clone the element
+                .children() //select all the children
+                .remove()   //remove all the children
+                .end()  //again go back to selected element
+                .text();
+
+            toggler.slideToggle(500, function () {
+
+                if ($(toggler).is(":visible")) {
+                    $(panelHeading).find(".arrow").removeClass('glyphicon-menu-right');
+                    $(panelHeading).find(".arrow").addClass('glyphicon-menu-down');
+                }
+                else {
+                    $(panelHeading).find(".arrow").removeClass('glyphicon-menu-down');
+                    $(panelHeading).find(".arrow").addClass('glyphicon-menu-right');
+                }
+            });
+        };
+
+        function filterExercises() {
+            let listCheckedItems = [];
+            $(".muscleGroupsCheckbox ul li label input:checked").each(function () {
+                listCheckedItems.push($(this).val());
+            });
+
+
+            $.ajax({
+                url: "/ExerciseLibrary/FilterExercises",
+                type: "POST",
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: { 'muscleGroups': listCheckedItems },
+                success: function (response) {
+                    window.location.href = response.redirectToUrl + response.muscleGroupsString;
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#checkboxBtn").click(function () {
+                if ($(".muscleGroupsCheckbox").hasClass('checkBoxHide')) {
+                    $(".muscleGroupsCheckbox").removeClass('checkBoxHide');
+                } else {
+                    $(".muscleGroupsCheckbox").addClass('checkBoxHide');
+                }
+     
+            });
+        });
+    </script>
+}

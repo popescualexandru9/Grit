@@ -9,7 +9,7 @@
 
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top  ">
         <div class="container">
             <div class="navbar-header">
                  @Html.ActionLink("Grit", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
@@ -25,15 +25,20 @@
 
                     @if (User.Identity.IsAuthenticated)
                     {
+                        <li>@Html.ActionLink("Training", "Training", "TrainingSplit")</li>
+                        <li>@Html.ActionLink("History", "History", "TrainingSplit")</li>
+                        <li>@Html.ActionLink("Progress", "Progress", "Weight")</li>
+                        <li>@Html.ActionLink("Exercise Library", "Index", "ExerciseLibrary", new { muscleGroups = "Chest" }  , null)</li>
                         if (User.IsInRole("Admin") || User.IsInRole("Employee"))
-                        {
-                            <li>@Html.ActionLink("Training", "Training", "TrainingSplit")</li>
-                            <li>@Html.ActionLink("History", "History", "TrainingSplit")</li>
-                            <li>@Html.ActionLink("Progress", "Progress", "Weight")</li>
+                                {
                             <li>@Html.ActionLink("Members", "Members", "Account")</li>
                         }
+                            }
+                    else
+                    {
+                        <li>@Html.ActionLink("About", "About", "Home")</li>
                     }
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
+
                     <hr />
                 </ul>
                 @Html.Partial("_LoginPartial")

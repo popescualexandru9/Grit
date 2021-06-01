@@ -1,11 +1,8 @@
 ﻿using Grit.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Grit.Services
 {
@@ -27,7 +24,7 @@ namespace Grit.Services
         public async Task<List<ExerciseApi>> GetExercises()
         {
 
-            string url = BuildUrl("exercise", 500);
+            string url = BuildUrl(Resources.WgerApiResource, 500);
             var exercises = new List<ExerciseApi>();
 
             var client = _httpFactory.CreateClient("ExerciseApiClient");
@@ -52,11 +49,11 @@ namespace Grit.Services
                     });
                 }
 
-                    return exercises;
+                return exercises;
             }
             else
             {
-                throw new OpenExerciseException(response.StatusCode, "Error response from wgerAPI: " + response.ReasonPhrase);
+                throw new OpenExerciseException(response.StatusCode, Resources.WgerApiError + response.ReasonPhrase);
             }
         }
 
@@ -64,7 +61,6 @@ namespace Grit.Services
         {
             return $"https://wger.de/api/v2/{resource}" +
                    $"?language=2&limit={limit}";
-             /*      $"&category={categoryId}";*/
         }
 
     }
