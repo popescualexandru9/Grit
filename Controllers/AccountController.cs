@@ -717,18 +717,19 @@ namespace Grit.Controllers
 
 
             UserManager.Update(user);
-            /* if (AddSplits)
-             {
-                 AddSplitsToUser(user);
-             }*/
+            // TODO add default splits
+            if (AddSplits)
+            {
+                AddSplitsToUser(user);
+            }
 
         }
         #endregion
 
         private void AddSplitsToUser(ApplicationUser user)
         {
-            var trainingSplitFullBody = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1008);
-            var trainingSplitPpl = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1012);
+            var trainingSplitFullBody = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1030);
+            var trainingSplitUL = _context.TrainingSplits.SingleOrDefault(x => x.Id == 1031);
 
 
             var userSplitFullBody = new UserSplit
@@ -737,14 +738,14 @@ namespace Grit.Controllers
                 SplitID = trainingSplitFullBody.Id
             };
 
-            var userSplitPpl = new UserSplit
+            var userSplitUL = new UserSplit
             {
                 UserID = user.Id,
-                SplitID = trainingSplitPpl.Id
+                SplitID = trainingSplitUL.Id
             };
 
             _context.UserSplits.Add(userSplitFullBody);
-            _context.UserSplits.Add(userSplitPpl);
+            _context.UserSplits.Add(userSplitUL);
             _context.SaveChanges();
         }
     }

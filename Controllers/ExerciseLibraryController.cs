@@ -42,7 +42,7 @@ namespace Grit.Controllers
                     new
                     {
                         redirectToUrl = Url.Action("Index", "ExerciseLibrary"),
-                        muscleGroupsString = muscleGroupsString
+                        muscleGroupsString
                     },
                     JsonRequestBehavior.AllowGet);
         }
@@ -72,5 +72,31 @@ namespace Grit.Controllers
             }
 
         }
+
+        public ActionResult AddExercise(ExerciseLibrary model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index", "ExerciseLibrary", new { status = Resources.WeightInvalid });
+            }
+
+            using (var _context = new ApplicationDbContext())
+            {
+
+                var exercise = new ExerciseLibrary
+                {
+                    MuscleGroup = model.MuscleGroup,
+                    Name = model.Name,
+                    Url = model.Url,
+                    Description = model.Description
+                };
+
+                _context.ExercisesLibrary.Add(exercise);
+                _context.SaveChanges();
+                return RedirectToAction("Index", "ExerciseLibrary");
+            }
+
+        }
+
     }
 }

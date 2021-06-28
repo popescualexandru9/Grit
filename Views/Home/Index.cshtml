@@ -1,4 +1,4 @@
-﻿@{
+﻿    @{
     ViewBag.Title = "Home Page";
 }
 
@@ -8,7 +8,14 @@
     <p class="pull-right"> - Angela Duckworth</p>
     <hr style="border-top-color: #66fcf1; width:100%" />
     <p>It is the ability to persist in something you feel passionate about and persevere when you face obstacles. This kind of passion is not about intense emotions or infatuation. It’s about having direction and commitment. When you have this kind of passion, you can stay committed to a task that may be difficult or boring.  </p>
-    <p>@Html.ActionLink("Log in »", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-lg" })</p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <p>@Html.ActionLink("Log in »", "Login", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-lg" })</p>
+    }
+    else
+    {
+        <p>@Html.ActionLink("Register »", "Register", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-lg" })</p>
+    }
 </div>
 
 <div class="row">
@@ -37,7 +44,7 @@
 </div>
 
 @section Quote{
-    Proud but Never Satisfied.
+    Proud but Never Satisfied
 }
 
 

@@ -20,8 +20,6 @@ namespace Grit.Controllers
         [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
-            /*   if (string.IsNullOrEmpty(categoryId))
-                   return BadRequest("CateogrryId parameter is missing");*/
             try
             {
                 var exercises = await _exerciseService.GetExercises();

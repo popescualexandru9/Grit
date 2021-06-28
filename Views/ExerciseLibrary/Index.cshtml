@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Exercise Library";
     string[] muscleGroups = { "Chest", "Back", "Arms", "Shoulders", "Legs", "Abs", "Calves" };
+    SelectList muscleGroupsList = new SelectList(muscleGroups);
 }
 
 <div>
@@ -15,28 +16,81 @@
 <hr />
 
 
-<div class="muscleGroupsCheckboxButton" >
+<div class="muscleGroupsCheckboxButton">
     <button class="btn-default btn" id="checkboxBtn"> Filter Exercises</button>
 </div>
 
 
 
 <div class="pull-left checkbox muscleGroupsCheckbox checkBoxHide">
-    <h4 >Muscles</h4>
+    <h4>Muscles</h4>
     <ul style="list-style-type:none">
         @foreach (var muscle in muscleGroups)
         {
-        <li style="font-size:19px; color:#eee">
-            @if (Model.Any(x => x.MuscleGroup == muscle))
-            {
-                <label><input type="checkbox" value="@muscle" checked onclick="filterExercises();">@muscle</label>
-                continue;
-            }
+            <li style="font-size:19px; color:#eee">
+                @if (Model.Any(x => x.MuscleGroup == muscle))
+                {
+                    <label><input type="checkbox" value="@muscle" checked onclick="filterExercises();">@muscle</label>
+                    continue;
+                }
 
-            <label><input type="checkbox" value="@muscle" onclick="filterExercises();">@muscle</label>
-        </li>
+                <label><input type="checkbox" value="@muscle" onclick="filterExercises();">@muscle</label>
+            </li>
         }
     </ul>
+
+    <br />
+
+    @if (User.IsInRole("Admin"))
+    {
+        // TODO functionality
+        <div style="margin-left:30px;">
+            <button class="btn-default btn" type="submit" data-toggle="modal" data-target="#addWeightModal"> Add Exercise </button>
+        </div>
+        <div class="modal fade" id="addWeightModal" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    @using (Html.BeginForm("AddExercise", "ExerciseLibrary", FormMethod.Post, new { }))
+                    {
+                    <div class="modal-body" style="margin-left:20px;">
+
+                        <div class="form-group row">
+                            @Html.Label("Exercise Name", new { @class = "col-sm-3 control-label", style = "padding-top : 8px;" })
+                            @Html.TextBox("Name", "", new { @class = "form-control col-sm-9 ", required = "true" })
+                        </div>
+
+                        <div class="form-group row">
+                            @Html.Label("Muscle Group", new { @class = "col-sm-3 control-label", style = "padding-top : 8px;" })
+                            @Html.DropDownList("MuscleGroup", muscleGroupsList as SelectList, new { @class = "form-control col-sm-9" })
+                        </div>
+
+                        <div class="form-group row">
+                            @Html.Label("Video Url", new { @class = "col-sm-3 control-label", style = "padding-top : 8px;" })
+                            @Html.TextBox("Url", "", new { @class = "form-control col-sm-9 ", required = "true", type = "url" })
+                        </div>
+
+
+
+                        <div class="form-group row">
+                            @Html.Label("Description", new { @class = "col-sm-3 control-label", style = "padding-top : 8px;" })
+                            @Html.TextArea("Description", new { @class = "form-control col-sm-9 ", required = "true" })
+                        </div>
+
+                    </div>
+
+                        <div class="modal-footer">
+                            <input type="submit" value="Submit" class="btn btn-primary" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <br /><br />
+    }
+
+
+
+
 </div>
 
 
@@ -116,13 +170,7 @@
 
     }
 
-    @if (User.IsInRole("Admin"))
-    {
-        // TODO functionality
-        <div >
-            <button class="btn-default btn" type="submit"> Add Exercise </button>
-        </div>
-    }
+
 
 </div>
 
@@ -180,8 +228,12 @@
                 } else {
                     $(".muscleGroupsCheckbox").addClass('checkBoxHide');
                 }
-     
+
             });
         });
     </script>
+}
+
+@section Quote{
+    Keep showing up
 }
